@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="@dimen/small_margin">
+
+    <TextView
+        android:id="@+id/headline_instance"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/instance_text"
+        android:textStyle="bold"
+        android:textSize="@dimen/default_text_size"
+        android:layout_marginBottom="@dimen/small_margin"/>
+
+    <TextView
+        android:id="@+id/select_course_from_spinner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/headline_instance"
+        android:text="@string/select_course"
+        android:textSize="@dimen/default_text_size"/>
+
+    <Spinner
+        android:id="@+id/course_spinner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/headline_instance"
+        android:layout_toEndOf="@id/select_course_from_spinner"/>
+
+    <TextView
+        android:id="@+id/weekdays_choice"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint="@string/course_date"
+        android:layout_below="@id/course_spinner"
+        android:textSize="@dimen/default_text_size"
+        android:layout_marginTop="@dimen/small_margin"/>
+
+    <TextView
+        android:id="@+id/hours_choice"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint="@string/course_hours"
+        android:layout_below="@id/weekdays_choice"
+        android:textSize="@dimen/default_text_size"
+        android:layout_marginTop="@dimen/small_margin"
+        android:layout_marginBottom="@dimen/small_margin"/>
+
+    <TextView
+        android:id="@+id/professor_name_input"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/professor_name"
+        android:layout_below="@id/hours_choice"
+        android:textSize="@dimen/default_text_size" />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/professor_name_input"
+        android:hint="@string/enter_professor_name"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true">
+
+        <Button
+            android:id="@+id/button_add_instance"
+            android:layout_weight="2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/add_instance" />
+
+        <Button
+            android:id="@+id/button_confirm"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/confirm" />
+
+    </LinearLayout>
+
+
+</RelativeLayout>

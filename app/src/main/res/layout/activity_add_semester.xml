@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="@dimen/default_margin">
+
+    <TextView
+        android:id="@+id/start_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/start_semester_text"
+        android:textStyle="bold"
+        android:textSize="@dimen/large_text_size"
+        android:layout_marginBottom="@dimen/default_margin"/>
+
+
+    <TextView
+        android:id="@+id/year_choice"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/year_choice"
+        android:textSize="@dimen/default_text_size"
+        android:layout_below="@+id/start_text"
+        android:layout_marginTop="@dimen/small_margin"
+        android:layout_marginBottom="@dimen/default_margin"/>
+
+
+    <Spinner
+        android:id="@+id/year_spinner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@+id/year_choice"
+        android:layout_below="@+id/start_text"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="@dimen/small_margin"
+        android:layout_marginBottom="@dimen/default_margin"/>
+
+
+    <TextView
+        android:id="@+id/semester_choice"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/semester_choice"
+        android:textSize="@dimen/default_text_size"
+        android:layout_below="@+id/year_choice"
+        android:layout_marginTop="@dimen/large_margin"
+        android:layout_marginBottom="@dimen/default_margin"/>
+
+
+    <Spinner
+        android:id="@+id/semester_spinner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@+id/semester_choice"
+        android:layout_below="@+id/year_choice"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="@dimen/large_margin"
+        android:layout_marginBottom="@dimen/default_margin"/>
+
+
+    <TextView
+        android:id="@+id/start_date_choice"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/semester_start"
+        android:textSize="@dimen/default_text_size"
+        android:layout_below="@+id/semester_choice"
+        android:layout_marginTop="@dimen/large_margin"
+        android:layout_marginBottom="@dimen/default_margin"/>
+
+
+    <Spinner
+        android:id="@+id/start_date_spinner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@+id/start_date_choice"
+        android:layout_below="@+id/semester_choice"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="@dimen/large_margin"
+        android:layout_marginBottom="@dimen/default_margin"/>
+
+
+    <TextView
+        android:id="@+id/end_date_choice"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/semester_end"
+        android:textSize="@dimen/default_text_size"
+        android:layout_below="@+id/start_date_choice"
+        android:layout_marginTop="@dimen/large_margin"
+        android:layout_marginBottom="@dimen/default_margin"/>
+
+
+    <Spinner
+        android:id="@+id/end_date_spinner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@+id/end_date_choice"
+        android:layout_below="@+id/start_date_choice"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="@dimen/large_margin"/>
+
+
+    <Button
+        android:id="@+id/confirm"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/confirm"
+        android:layout_alignParentBottom="true"
+        android:layout_centerInParent="true" />
+</RelativeLayout>
