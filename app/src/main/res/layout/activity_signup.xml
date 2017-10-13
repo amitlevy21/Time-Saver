@@ -3,8 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:fitsSystemWindows="true"
-    android:background="@color/colorPrimary">
+    android:fitsSystemWindows="true">
 
     <LinearLayout
         android:orientation="vertical"
@@ -14,11 +13,11 @@
         android:paddingLeft="24dp"
         android:paddingRight="24dp">
 
-        <ImageView android:src="@mipmap/icon_launcher"
+        <ImageView android:src="@drawable/logo_in_app"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:minWidth="80dp"
-            android:minHeight="80dp"
+            android:minWidth="140dp"
+            android:minHeight="140dp"
             android:layout_marginBottom="24dp"
             android:layout_gravity="center_horizontal"
             android:contentDescription="@string/logo" />
