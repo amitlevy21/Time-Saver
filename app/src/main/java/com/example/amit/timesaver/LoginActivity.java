@@ -31,10 +31,14 @@ public class LoginActivity extends AppCompatActivity {
     private FirebaseAuth.AuthStateListener mAuthListener;
 
 
-    @InjectView(R.id.input_email) EditText _emailText;
-    @InjectView(R.id.input_password) EditText _passwordText;
-    @InjectView(R.id.btn_login) Button _loginButton;
-    @InjectView(R.id.link_signup) TextView _signupLink;
+    @InjectView(R.id.input_email)
+    EditText _emailText;
+    @InjectView(R.id.input_password)
+    EditText _passwordText;
+    @InjectView(R.id.btn_login)
+    Button _loginButton;
+    @InjectView(R.id.link_signup)
+    TextView _signupLink;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -68,6 +72,10 @@ public class LoginActivity extends AppCompatActivity {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 if (user != null) {
                     //user signed in
+                    Intent dashboardIntent = new Intent(getApplicationContext(), DashboardActivity.class);
+                    dashboardIntent.putExtra(Keys.USER, user.getUid()); //Uid is unique? i can't pass the entire object
+                    startActivity(dashboardIntent);
+                    finish();
                 } else {
                     // user is signed out
                 }
@@ -128,27 +136,18 @@ public class LoginActivity extends AppCompatActivity {
                                     Toast.LENGTH_SHORT).show();
                             onLoginFailed();
                             progressDialog.dismiss();
-                            //updateUI(null);
+
                         }
 
 
                     }
                 });
 
-        /*new Handler().postDelayed(
-                new Runnable() {
-                    public void run() {
-                        // On complete call either onLoginSuccess or onLoginFailed
-                        onLoginSuccess();
-                        // onLoginFailed();
-                        progressDialog.dismiss();
-                    }
-                }, 3000);*/
     }
 
     private void updateUI(FirebaseUser user) {
-        if(user != null) {
-            Intent dashboardIntent = new Intent(this, DashboardActivity.class);
+        if (user != null) {
+            Intent dashboardIntent = new Intent(this, AddSemesterActivity.class);
             dashboardIntent.putExtra(Keys.USER, user.getUid()); //Uid is unique? i can't pass the entire object
             startActivity(dashboardIntent);
             finish();

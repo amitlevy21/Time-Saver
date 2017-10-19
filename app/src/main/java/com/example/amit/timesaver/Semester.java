@@ -18,11 +18,10 @@ public class Semester {
     private ArrayList<Course> courses = new ArrayList<>();
     private eSemesterType semesterTypeArr;
 
-    public Semester(int year, MyDate startDate, MyDate endDate, int numOfCourses, eSemesterType semesterTypeArr) {
+    public Semester(int year, MyDate startDate, MyDate endDate, eSemesterType semesterTypeArr) {
         this.year = year;
         this.startDate = startDate;
         this.endDate = endDate;
-        this.numOfCourses = numOfCourses;
         this.semesterTypeArr = semesterTypeArr;
     }
 

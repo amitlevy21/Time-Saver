@@ -7,4 +7,5 @@ package com.example.amit.timesaver;
 class Keys {
 
     public static final String USER = "user_key";
+    public static String SEMESTERS = "semesters_key";
 }

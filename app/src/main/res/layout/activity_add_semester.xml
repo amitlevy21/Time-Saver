@@ -50,14 +50,15 @@
 
 
     <Spinner
-        android:id="@+id/semester_spinner"
+        android:id="@+id/semester_type_spinner"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_toEndOf="@+id/semester_choice"
         android:layout_below="@+id/year_choice"
         android:layout_alignParentEnd="true"
         android:layout_marginTop="@dimen/large_margin"
-        android:layout_marginBottom="@dimen/default_margin"/>
+        android:layout_marginBottom="@dimen/default_margin"
+        android:entries="@array/semester_type"/>
 
 
     <TextView
@@ -103,11 +104,24 @@
         android:layout_marginTop="@dimen/large_margin"/>
 
 
-    <Button
-        android:id="@+id/confirm"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/confirm"
-        android:layout_alignParentBottom="true"
-        android:layout_centerInParent="true" />
+        android:layout_alignParentBottom="true">
+
+        <Button
+            android:id="@+id/button_add_semester"
+            android:layout_weight="2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/add_another_semester" />
+
+        <Button
+            android:id="@+id/button_confirm_add_semester"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/confirm" />
+
+    </LinearLayout>
 </RelativeLayout>
