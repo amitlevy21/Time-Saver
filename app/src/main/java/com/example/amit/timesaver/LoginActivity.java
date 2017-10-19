@@ -119,6 +119,7 @@ public class LoginActivity extends AppCompatActivity {
                             Log.d(TAG, "signInWithEmail:success");
                             FirebaseUser user = mAuth.getCurrentUser();
                             onLoginSuccess();
+                            progressDialog.dismiss();
                             updateUI(user);
                         } else {
                             // If sign in fails, display a message to the user.
@@ -126,6 +127,7 @@ public class LoginActivity extends AppCompatActivity {
                             Toast.makeText(LoginActivity.this, "Authentication failed.",
                                     Toast.LENGTH_SHORT).show();
                             onLoginFailed();
+                            progressDialog.dismiss();
                             //updateUI(null);
                         }
 
@@ -145,10 +147,13 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void updateUI(FirebaseUser user) {
-        Intent dashboardIntent = new Intent(this, DashboardActivity.class);
-        dashboardIntent.putExtra(Keys.USER, user.getUid()); //Uid is unique? i can't pass the entire object
-        startActivity(dashboardIntent);
-        finish();
+        if(user != null) {
+            Intent dashboardIntent = new Intent(this, DashboardActivity.class);
+            dashboardIntent.putExtra(Keys.USER, user.getUid()); //Uid is unique? i can't pass the entire object
+            startActivity(dashboardIntent);
+            finish();
+        }
+
     }
 
 
@@ -158,8 +163,7 @@ public class LoginActivity extends AppCompatActivity {
             if (resultCode == RESULT_OK) {
 
                 // TODO: Implement successful signup logic here
-                // By default we just finish the Activity and log them in automatically
-                this.finish();
+                Toast.makeText(this, "Successful sign-up! you can now log in", Toast.LENGTH_LONG).show();
             }
         }
     }
