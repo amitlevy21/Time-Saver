@@ -33,6 +33,7 @@
     <string name="professor_name">Professor Name:</string>
     <string name="enter_professor_name">Enter Professor Name</string>
     <string name="select_course">Select Course</string>
+    <string name="auth_failed">Login Error occurd please try again</string>
 
     <string-array name="Courses">
         <item>Male</item>
