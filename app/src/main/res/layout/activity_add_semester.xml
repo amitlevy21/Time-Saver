@@ -72,15 +72,18 @@
         android:layout_marginBottom="@dimen/default_margin"/>
 
 
-    <Spinner
-        android:id="@+id/start_date_spinner"
+    <TextView
+        android:id="@+id/start_date_text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_toEndOf="@+id/start_date_choice"
         android:layout_below="@+id/semester_choice"
         android:layout_alignParentEnd="true"
         android:layout_marginTop="@dimen/large_margin"
-        android:layout_marginBottom="@dimen/default_margin"/>
+        android:layout_marginBottom="@dimen/default_margin"
+        android:textSize="@dimen/default_text_size"
+        android:text="@string/click_here"
+        android:layout_marginStart="@dimen/default_margin"/>
 
 
     <TextView
@@ -91,17 +94,20 @@
         android:textSize="@dimen/default_text_size"
         android:layout_below="@+id/start_date_choice"
         android:layout_marginTop="@dimen/large_margin"
-        android:layout_marginBottom="@dimen/default_margin"/>
+        android:layout_marginBottom="@dimen/default_margin" />
 
 
-    <Spinner
-        android:id="@+id/end_date_spinner"
+    <TextView
+        android:id="@+id/end_date_text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_toEndOf="@+id/end_date_choice"
         android:layout_below="@+id/start_date_choice"
         android:layout_alignParentEnd="true"
-        android:layout_marginTop="@dimen/large_margin"/>
+        android:layout_marginTop="@dimen/large_margin"
+        android:textSize="@dimen/default_text_size"
+        android:text="@string/click_here"
+        android:layout_marginStart="@dimen/default_margin"/>
 
 
     <LinearLayout

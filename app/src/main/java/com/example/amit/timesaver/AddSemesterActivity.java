@@ -10,6 +10,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.codetroopers.betterpickers.calendardatepicker.CalendarDatePickerDialogFragment;
@@ -118,7 +119,7 @@ public class AddSemesterActivity extends AppCompatActivity implements CalendarDa
             }
         });
 
-        Spinner spinSemesterStartDate = (Spinner) findViewById(R.id.start_date_spinner);
+        TextView spinSemesterStartDate = (TextView) findViewById(R.id.start_date_text_view);
         spinSemesterStartDate.setOnClickListener(new View.OnClickListener() {
             //thanks android-better-pickers
             @Override
@@ -132,7 +133,7 @@ public class AddSemesterActivity extends AppCompatActivity implements CalendarDa
             }
         });
 
-        Spinner spinSemesterEndDate = (Spinner) findViewById(R.id.end_date_spinner);
+        TextView spinSemesterEndDate = (TextView) findViewById(R.id.end_date_text_view);
         spinSemesterEndDate.setOnClickListener(new View.OnClickListener() {
             //thanks android-better-pickers
             @Override

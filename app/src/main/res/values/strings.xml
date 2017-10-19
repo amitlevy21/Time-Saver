@@ -35,6 +35,7 @@
     <string name="select_course">Select Course</string>
     <string name="auth_failed">Login Error occurd please try again</string>
     <string name="add_another_semester">add another semester</string>
+    <string name="click_here">Click Here</string>
 
     <string-array name="semester_type">
         <item>A</item>
