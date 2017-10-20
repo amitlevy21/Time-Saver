@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "622515139889-edq8u4g4jgh3nvvcquvi0mq9hse4mgs3.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.amit.timesaver",
+            "certificate_hash": "6cbb46a131129bd9248ebac6ac378125fb94a01f"
+          }
+        },
+        {
           "client_id": "622515139889-qa013qvgsn6e6qubmbkjr1butbhjjs6m.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

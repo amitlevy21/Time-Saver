@@ -3,7 +3,6 @@ package com.example.amit.timesaver;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -17,9 +16,12 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.*;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.*;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -27,8 +29,14 @@ import butterknife.InjectView;
 public class LoginActivity extends AppCompatActivity {
     private static final String TAG = "LoginActivity";
     private static final int REQUEST_SIGNUP = 0;
+
+
+    private String userID;
+
+    private FirebaseDatabase mFirebaseDatabase;
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
+    private DatabaseReference databaseReference;
 
 
     @InjectView(R.id.input_email)
@@ -65,24 +73,36 @@ public class LoginActivity extends AppCompatActivity {
         });
 
         mAuth = FirebaseAuth.getInstance();
+        mFirebaseDatabase = FirebaseDatabase.getInstance();
+        databaseReference = mFirebaseDatabase.getReference();
+
+        databaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Toast.makeText(getApplicationContext(), "Firebase write" , Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
 
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser user = firebaseAuth.getCurrentUser();
+                final FirebaseUser user = firebaseAuth.getCurrentUser();
                 if (user != null) {
                     //user signed in
-                    Intent dashboardIntent = new Intent(getApplicationContext(), DashboardActivity.class);
-                    dashboardIntent.putExtra(Keys.USER, user.getUid()); //Uid is unique? i can't pass the entire object
-                    startActivity(dashboardIntent);
+                    Intent addSemesterIntent = new Intent(getApplicationContext(), DashboardActivity.class);
+                    startActivity(addSemesterIntent);
                     finish();
+
                 } else {
                     // user is signed out
                 }
             }
         };
-
-
     }
 
     @Override
@@ -125,10 +145,10 @@ public class LoginActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "signInWithEmail:success");
-                            FirebaseUser user = mAuth.getCurrentUser();
-                            onLoginSuccess();
+                            final FirebaseUser user = mAuth.getCurrentUser();
                             progressDialog.dismiss();
-                            updateUI(user);
+                            onLoginSuccess(user);
+
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "signInWithEmail:failure", task.getException());
@@ -136,25 +156,11 @@ public class LoginActivity extends AppCompatActivity {
                                     Toast.LENGTH_SHORT).show();
                             onLoginFailed();
                             progressDialog.dismiss();
-
                         }
-
-
                     }
                 });
 
     }
-
-    private void updateUI(FirebaseUser user) {
-        if (user != null) {
-            Intent dashboardIntent = new Intent(this, AddSemesterActivity.class);
-            dashboardIntent.putExtra(Keys.USER, user.getUid()); //Uid is unique? i can't pass the entire object
-            startActivity(dashboardIntent);
-            finish();
-        }
-
-    }
-
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -163,6 +169,15 @@ public class LoginActivity extends AppCompatActivity {
 
                 // TODO: Implement successful signup logic here
                 Toast.makeText(this, "Successful sign-up! you can now log in", Toast.LENGTH_LONG).show();
+                FirebaseUser user = mAuth.getCurrentUser();
+                userID = user.getUid();
+
+                Bundle bundle = data.getExtras();
+                MyUserInfo myUserInfo = (MyUserInfo) bundle.getSerializable(Keys.USER_INFO);
+                databaseReference.child("users").child(userID).setValue(myUserInfo);
+                Intent addSemesterIntent = new Intent(getApplicationContext(), DashboardActivity.class);
+                startActivity(addSemesterIntent);
+                finish();
             }
         }
     }
@@ -173,9 +188,8 @@ public class LoginActivity extends AppCompatActivity {
         moveTaskToBack(true);
     }
 
-    public void onLoginSuccess() {
+    public void onLoginSuccess(FirebaseUser user) {
         _loginButton.setEnabled(true);
-        //finish();
     }
 
     public void onLoginFailed() {

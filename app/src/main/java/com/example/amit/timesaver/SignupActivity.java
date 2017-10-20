@@ -2,6 +2,7 @@ package com.example.amit.timesaver;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -18,6 +19,8 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -35,7 +38,10 @@ public class SignupActivity extends AppCompatActivity {
     Button _signupButton;
     @InjectView(R.id.link_login)
     TextView _loginLink;
+
     private FirebaseAuth mAuth;
+
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -77,8 +83,8 @@ public class SignupActivity extends AppCompatActivity {
         progressDialog.setMessage("Creating Account...");
         progressDialog.show();
 
-        String name = _nameText.getText().toString();
-        String email = _emailText.getText().toString();
+        final String name = _nameText.getText().toString();
+        final String email = _emailText.getText().toString();
         String password = _passwordText.getText().toString();
 
         // TODO: Implement your own signup logic here.
@@ -90,8 +96,8 @@ public class SignupActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "createUserWithEmail:success");
-                            FirebaseUser user = mAuth.getCurrentUser();
-                            onSignupSuccess();
+
+                            onSignupSuccess(new MyUserInfo(email, name));
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "createUserWithEmail:failure", task.getException());
@@ -105,9 +111,11 @@ public class SignupActivity extends AppCompatActivity {
     }
 
 
-    public void onSignupSuccess() {
+    public void onSignupSuccess(MyUserInfo myUserInfo) {
         _signupButton.setEnabled(true);
-        setResult(RESULT_OK, null);
+        Intent intent = new Intent();
+        intent.putExtra(Keys.USER_INFO, myUserInfo);
+        setResult(RESULT_OK, intent);
         finish();
     }
 

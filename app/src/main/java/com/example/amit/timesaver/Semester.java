@@ -1,5 +1,6 @@
 package com.example.amit.timesaver;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
@@ -7,7 +8,7 @@ import java.util.ArrayList;
  */
 
 
-public class Semester {
+public class Semester implements Serializable{
 
     enum eSemesterType  {A, B, C}
 
