@@ -12,6 +12,7 @@ public class Semester implements Serializable{
 
     enum eSemesterType  {A, B, C}
 
+    private static final long serialVersionUID = 1L;
     private int year;
     private MyDate startDate;
     private MyDate endDate;
@@ -55,5 +56,9 @@ public class Semester implements Serializable{
 
     public Course getCourseAtIndex(int index) {
         return courses.get(index);
+    }
+
+    public eSemesterType getSemesterTypeArr() {
+        return semesterTypeArr;
     }
 }

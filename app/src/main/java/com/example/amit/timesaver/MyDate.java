@@ -2,11 +2,16 @@ package com.example.amit.timesaver;
 
 import android.support.annotation.NonNull;
 
+import java.io.Serializable;
+
 /**
  * Created by amit on 13/10/17.
  */
 
-class MyDate implements Comparable<MyDate>{
+class MyDate implements Comparable<MyDate> , Serializable{
+
+    private static final long serialVersionUID = 1L;
+
     int year;
     int month;
     int day;

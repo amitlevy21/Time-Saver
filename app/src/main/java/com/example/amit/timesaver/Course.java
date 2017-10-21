@@ -1,12 +1,15 @@
 package com.example.amit.timesaver;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
  * Created by amit on 13/10/17.
  */
 
-class Course {
+class Course implements Serializable{
+
+    private static final long serialVersionUID = 1L;
 
     private String name;
     private Semester semesterTaken;

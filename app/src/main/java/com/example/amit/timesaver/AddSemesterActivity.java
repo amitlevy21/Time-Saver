@@ -47,10 +47,11 @@ public class AddSemesterActivity extends AppCompatActivity implements CalendarDa
         confirmButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                onAnyButtonClick();
-                Intent intentEnterCourses = new Intent(getApplicationContext(), AddCourseActivity.class);
-                intentEnterCourses.putExtra(Keys.SEMESTERS, semesters);
-                startActivity(intentEnterCourses);
+                if(onAnyButtonClick()) {
+                    Intent intentEnterCourses = new Intent(getApplicationContext(), AddCourseActivity.class);
+                    intentEnterCourses.putExtra(Keys.SEMESTERS, semesters);
+                    startActivity(intentEnterCourses);
+                }
             }
         });
 
@@ -58,35 +59,11 @@ public class AddSemesterActivity extends AppCompatActivity implements CalendarDa
         addSemesterButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                onAnyButtonClick();
-
+                if(onAnyButtonClick())
+                    Toast.makeText(getApplicationContext(), "Semester successfully added!", Toast.LENGTH_LONG).show();
             }
         });
 
-    }
-
-    private void onAnyButtonClick() {
-        if(startDateSelected != null && endDateSelected != null) {
-            Semester semester = new Semester(yearSelected, startDateSelected, endDateSelected, semesterTypeSelected);
-            semesters.add(semester);
-        } else {
-            Toast.makeText(getApplicationContext(), "Please choose start and end dates for the semester", Toast.LENGTH_LONG)
-                    .show();
-        }
-    }
-
-    @Override
-    public void onDateSet(CalendarDatePickerDialogFragment dialog, int year, int monthOfYear, int dayOfMonth) {
-        MyDate myDate = new MyDate(year, monthOfYear, dayOfMonth);
-        if(dialog.getTag().equals(FRAG_DATE_PICKER_START)) {
-            startDateSelected = myDate;
-            TextView spinSemesterStartDate = (TextView) findViewById(R.id.start_date_text_view);
-            spinSemesterStartDate.setText(dayOfMonth + "/" + monthOfYear + "/" + year);
-        } else {
-            endDateSelected = myDate;
-            TextView spinSemesterEndDate = (TextView) findViewById(R.id.end_date_text_view);
-            spinSemesterEndDate.setText(dayOfMonth + "/" + monthOfYear + "/" + year);
-        }
     }
 
     private void setSpinnerListeners(ArrayList<String> years) {
@@ -151,6 +128,34 @@ public class AddSemesterActivity extends AppCompatActivity implements CalendarDa
             }
         });
     }
+
+
+    private boolean onAnyButtonClick() {
+        if(startDateSelected != null && endDateSelected != null) {
+            Semester semester = new Semester(yearSelected, startDateSelected, endDateSelected, semesterTypeSelected);
+            semesters.add(semester);
+            return true;
+        } else {
+            Toast.makeText(getApplicationContext(), "Please choose start and end dates for the semester", Toast.LENGTH_LONG)
+                    .show();
+            return false;
+        }
+    }
+
+    @Override
+    public void onDateSet(CalendarDatePickerDialogFragment dialog, int year, int monthOfYear, int dayOfMonth) {
+        MyDate myDate = new MyDate(year, monthOfYear, dayOfMonth);
+        if(dialog.getTag().equals(FRAG_DATE_PICKER_START)) {
+            startDateSelected = myDate;
+            TextView spinSemesterStartDate = (TextView) findViewById(R.id.start_date_text_view);
+            spinSemesterStartDate.setText(dayOfMonth + "/" + monthOfYear + "/" + year);
+        } else {
+            endDateSelected = myDate;
+            TextView spinSemesterEndDate = (TextView) findViewById(R.id.end_date_text_view);
+            spinSemesterEndDate.setText(dayOfMonth + "/" + monthOfYear + "/" + year);
+        }
+    }
+
 
 
 }
