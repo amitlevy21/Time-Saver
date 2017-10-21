@@ -11,8 +11,9 @@
     <string name="add_course">Add another course</string>
     <string name="confirm">Confirm</string>
     <string name="instance_text">When do you study those courses?</string>
-    <string name="course_date">Weekly Days:(Date)</string>
-    <string name="course_hours">Daily Hours:(Date)</string>
+    <string name="course_date">Day Taken:</string>
+    <string name="course_start_hour">Start Hour:</string>
+    <string name="course_end_hour">End Hour:</string>
     <string name="add_instance">Add another instance</string>
     <string name="dashboard">The Dashboard</string>
     <string name="dashboard_today">Today\'s Activity</string>
