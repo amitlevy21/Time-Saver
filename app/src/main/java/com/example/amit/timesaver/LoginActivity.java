@@ -47,6 +47,7 @@ public class LoginActivity extends AppCompatActivity {
     Button _loginButton;
     @InjectView(R.id.link_signup)
     TextView _signupLink;
+    private boolean firstLogin;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -94,9 +95,11 @@ public class LoginActivity extends AppCompatActivity {
                 final FirebaseUser user = firebaseAuth.getCurrentUser();
                 if (user != null) {
                     //user signed in
-                    Intent addSemesterIntent = new Intent(getApplicationContext(), DashboardActivity.class);
-                    startActivity(addSemesterIntent);
-                    finish();
+                    if(!firstLogin) {
+                        Intent addSemesterIntent = new Intent(getApplicationContext(), DashboardActivity.class);
+                        startActivity(addSemesterIntent);
+                        finish();
+                    }
 
                 } else {
                     // user is signed out
@@ -147,7 +150,7 @@ public class LoginActivity extends AppCompatActivity {
                             Log.d(TAG, "signInWithEmail:success");
                             final FirebaseUser user = mAuth.getCurrentUser();
                             progressDialog.dismiss();
-                            onLoginSuccess(user);
+                            onLoginSuccess();
 
                         } else {
                             // If sign in fails, display a message to the user.
@@ -175,9 +178,7 @@ public class LoginActivity extends AppCompatActivity {
                 Bundle bundle = data.getExtras();
                 MyUserInfo myUserInfo = (MyUserInfo) bundle.getSerializable(Keys.USER_INFO);
                 databaseReference.child("users").child(userID).setValue(myUserInfo);
-                Intent addSemesterIntent = new Intent(getApplicationContext(), DashboardActivity.class);
-                startActivity(addSemesterIntent);
-                finish();
+                firstLogin = true;
             }
         }
     }
@@ -188,8 +189,19 @@ public class LoginActivity extends AppCompatActivity {
         moveTaskToBack(true);
     }
 
-    public void onLoginSuccess(FirebaseUser user) {
+    public void onLoginSuccess() {
         _loginButton.setEnabled(true);
+
+        if(firstLogin) {
+            Intent addSemesterIntent = new Intent(getApplicationContext(), AddSemesterActivity.class);
+            startActivity(addSemesterIntent);
+            firstLogin = false;
+        } else {
+            Intent addSemesterIntent = new Intent(getApplicationContext(), DashboardActivity.class);
+            startActivity(addSemesterIntent);
+        }
+
+        finish();
     }
 
     public void onLoginFailed() {

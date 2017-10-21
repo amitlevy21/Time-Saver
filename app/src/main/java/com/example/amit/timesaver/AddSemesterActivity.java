@@ -37,7 +37,7 @@ public class AddSemesterActivity extends AppCompatActivity implements CalendarDa
 
         ArrayList<String> years = new ArrayList<>();
         int thisYear = Calendar.getInstance().get(Calendar.YEAR);
-        for (int i = 1900; i <= thisYear; i++) {
+        for (int i = 1970; i <= thisYear + 10; i++) {
             years.add(Integer.toString(i));
         }
 
@@ -80,8 +80,12 @@ public class AddSemesterActivity extends AppCompatActivity implements CalendarDa
         MyDate myDate = new MyDate(year, monthOfYear, dayOfMonth);
         if(dialog.getTag().equals(FRAG_DATE_PICKER_START)) {
             startDateSelected = myDate;
+            TextView spinSemesterStartDate = (TextView) findViewById(R.id.start_date_text_view);
+            spinSemesterStartDate.setText(dayOfMonth + "/" + monthOfYear + "/" + year);
         } else {
             endDateSelected = myDate;
+            TextView spinSemesterEndDate = (TextView) findViewById(R.id.end_date_text_view);
+            spinSemesterEndDate.setText(dayOfMonth + "/" + monthOfYear + "/" + year);
         }
     }
 

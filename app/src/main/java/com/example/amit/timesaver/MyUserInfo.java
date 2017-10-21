@@ -11,6 +11,7 @@ public class MyUserInfo implements Serializable{
     private String email;
     private String fullName;
 
+
     public MyUserInfo() {
     }
 
@@ -19,7 +20,6 @@ public class MyUserInfo implements Serializable{
         this.email = email;
         this.fullName = fullName;
     }
-
 
     public String getEmail() {
         return email;
