@@ -10,4 +10,5 @@
     <dimen name="extra_large_margin">40dp</dimen>
     <dimen name="far_margin">200dp</dimen>
     <dimen name="default_margin">20dp</dimen>
+    <dimen name="fab_margin">16dp</dimen>
 </resources>

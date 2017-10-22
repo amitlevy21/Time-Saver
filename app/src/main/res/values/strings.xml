@@ -37,11 +37,23 @@
     <string name="auth_failed">Login Error occurd please try again</string>
     <string name="add_another_semester">add another semester</string>
     <string name="click_here">Click Here</string>
+    <string name="menu">Menu</string>
+    <string name="drawer_open">drawer_open</string>
+    <string name="drawer_closed">drawer_closed</string>
 
     <string-array name="semester_type">
         <item>A</item>
         <item>B</item>
         <item>C</item>
     </string-array>
+
+
+    //////////////
+    <string-array name="planets_array">
+        <item>A</item>
+        <item>B</item>
+        <item>C</item>
+    </string-array>
+    <string name="title_activity_base">BaseActivity</string>
 
 </resources>

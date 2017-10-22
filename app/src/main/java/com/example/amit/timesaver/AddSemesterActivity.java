@@ -17,7 +17,7 @@ import com.codetroopers.betterpickers.calendardatepicker.CalendarDatePickerDialo
 
 import java.util.ArrayList;
 
-public class AddSemesterActivity extends AppCompatActivity implements CalendarDatePickerDialogFragment.OnDateSetListener {
+public class AddSemesterActivity extends BaseActivity implements CalendarDatePickerDialogFragment.OnDateSetListener {
 
     private static final String FRAG_DATE_PICKER_START = "frag_date_picker_start";
     private static final String FRAG_DATE_PICKER_END = "frag_date_picker_end";
