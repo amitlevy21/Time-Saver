@@ -41,32 +41,11 @@ public class AddSemesterActivity extends AppCompatActivity implements CalendarDa
             years.add(Integer.toString(i));
         }
 
-        setSpinnerListeners(years);
-
-        Button confirmButton = (Button) findViewById(R.id.button_confirm_add_semester);
-        confirmButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(onAnyButtonClick()) {
-                    Intent intentEnterCourses = new Intent(getApplicationContext(), AddCourseActivity.class);
-                    intentEnterCourses.putExtra(Keys.SEMESTERS, semesters);
-                    startActivity(intentEnterCourses);
-                }
-            }
-        });
-
-        Button addSemesterButton = (Button) findViewById(R.id.button_add_semester);
-        addSemesterButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(onAnyButtonClick())
-                    Toast.makeText(getApplicationContext(), "Semester successfully added!", Toast.LENGTH_LONG).show();
-            }
-        });
+        setListeners(years);
 
     }
 
-    private void setSpinnerListeners(ArrayList<String> years) {
+    private void setListeners(ArrayList<String> years) {
         final ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, years);
 
         Spinner spinYear = (Spinner)findViewById(R.id.year_spinner);
@@ -125,6 +104,27 @@ public class AddSemesterActivity extends AppCompatActivity implements CalendarDa
                         .setDoneText("Select")
                         .setCancelText("Cancel");
                 cdp.show(getSupportFragmentManager(), FRAG_DATE_PICKER_END);
+            }
+        });
+
+        Button confirmButton = (Button) findViewById(R.id.button_confirm_add_semester);
+        confirmButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(onAnyButtonClick()) {
+                    Intent intentEnterCourses = new Intent(getApplicationContext(), AddCourseActivity.class);
+                    intentEnterCourses.putExtra(Keys.SEMESTERS, semesters);
+                    startActivity(intentEnterCourses);
+                }
+            }
+        });
+
+        Button addSemesterButton = (Button) findViewById(R.id.button_add_semester);
+        addSemesterButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(onAnyButtonClick())
+                    Toast.makeText(getApplicationContext(), "Semester successfully added!", Toast.LENGTH_LONG).show();
             }
         });
     }
