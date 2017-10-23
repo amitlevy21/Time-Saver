@@ -3,7 +3,6 @@ package com.example.amit.timesaver;
 import java.util.Calendar;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -111,7 +110,7 @@ public class AddSemesterActivity extends BaseActivity implements CalendarDatePic
         confirmButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(onAnyButtonClick()) {
+                if(checkInputBeforeNextActivity()) {
                     Intent intentEnterCourses = new Intent(getApplicationContext(), AddCourseActivity.class);
                     intentEnterCourses.putExtra(Keys.SEMESTERS, semesters);
                     startActivity(intentEnterCourses);
@@ -123,14 +122,14 @@ public class AddSemesterActivity extends BaseActivity implements CalendarDatePic
         addSemesterButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(onAnyButtonClick())
+                if(checkInputBeforeNextActivity())
                     Toast.makeText(getApplicationContext(), "Semester successfully added!", Toast.LENGTH_LONG).show();
             }
         });
     }
 
 
-    private boolean onAnyButtonClick() {
+    private boolean checkInputBeforeNextActivity() {
         if(startDateSelected != null && endDateSelected != null) {
             Semester semester = new Semester(yearSelected, startDateSelected, endDateSelected, semesterTypeSelected);
             semesters.add(semester);
