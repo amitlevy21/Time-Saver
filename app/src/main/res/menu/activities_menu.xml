@@ -1,20 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.example.MainActivity">
     <item
         android:id="@+id/go_to_dashboard"
         android:icon="@drawable/ic_recurrence_bubble_fill"
         android:title="DashBoard"
+        android:orderInCategory="1"
         android:checkable="true"
         />
     <item
         android:id="@+id/go_to_semester"
         android:icon="@drawable/ic_recurrence_bubble_fill"
+        android:orderInCategory="2"
         android:title="semester"
         android:checkable="true"
         />
     <item
         android:id="@+id/go_to_course"
         android:icon="@drawable/ic_recurrence_bubble_fill"
+        android:orderInCategory="3"
         android:title="course"
         android:checkable="true"
         />

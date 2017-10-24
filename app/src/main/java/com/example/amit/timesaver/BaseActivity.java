@@ -1,19 +1,26 @@
 package com.example.amit.timesaver;
 
 import android.content.Intent;
-import android.nfc.Tag;
+import android.support.design.widget.NavigationView;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
 
-public class BaseActivity extends AppCompatActivity {
+public class BaseActivity extends AppCompatActivity implements
+        NavigationView.OnNavigationItemSelectedListener{
+
+    private NavigationView navigationView;
+    private DrawerLayout fullLayout;
+    private Toolbar toolbar;
+    private ActionBarDrawerToggle drawerToggle;
+    private int selectedNavItemId;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,58 +30,93 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     @Override
-    public void setContentView(int layoutResID)
-    {
-        DrawerLayout fullView = (DrawerLayout) getLayoutInflater().inflate(R.layout.activity_base, null);
-        FrameLayout activityContainer = (FrameLayout) fullView.findViewById(R.id.activity_content);
+    public void setContentView(int layoutResID) {
+
+        fullLayout = (DrawerLayout) getLayoutInflater().inflate(R.layout.activity_base, null);
+
+        FrameLayout activityContainer = (FrameLayout) fullLayout.findViewById(R.id.activity_content);
         getLayoutInflater().inflate(layoutResID, activityContainer, true);
-        super.setContentView(fullView);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        if (useToolbar())
-        {
+
+
+        super.setContentView(fullLayout);
+
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        navigationView = (NavigationView) findViewById(R.id.navigationView);
+
+        if (useToolbar()) {
             setSupportActionBar(toolbar);
-            setTitle("Activity Title");
-        }
-        else
-        {
+        } else {
             toolbar.setVisibility(View.GONE);
+        }
+
+        setUpNavView();
+
+    }
+
+
+
+
+    protected void setUpNavView()
+    {
+        navigationView.setNavigationItemSelectedListener(this);
+
+        if( useDrawerToggle()) { // use the hamburger menu
+            drawerToggle = new ActionBarDrawerToggle(this, fullLayout, toolbar,
+                    R.string.drawer_open,
+                    R.string.drawer_closed);
+
+            fullLayout.setDrawerListener(drawerToggle);
+            drawerToggle.syncState();
+        } else if(useToolbar() && getSupportActionBar() != null) {
+            // Use home/back button instead
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setHomeAsUpIndicator(getResources()
+                    .getDrawable(R.drawable.bp_material_button_background));
         }
     }
 
-    protected boolean useToolbar()
+    protected boolean useDrawerToggle()
     {
         return true;
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.activities_menu, menu);
+    public boolean onNavigationItemSelected(MenuItem menuItem) {
+        fullLayout.closeDrawer(GravityCompat.START);
+        selectedNavItemId = menuItem.getItemId();
+
+        return onOptionsItemSelected(menuItem);
+    }
+
+    protected boolean useToolbar() {
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        Intent intent;
+
+
         switch (item.getItemId()) {
             case R.id.go_to_dashboard:
-                Intent anIntent1 = new Intent(getApplicationContext(), Dashboard.class);
-                startActivity(anIntent1);
+                intent = new Intent(getApplicationContext(), DashboardActivity.class);
+                startActivity(intent);
                 return true;
 
             case R.id.go_to_semester:
-                Intent anIntent2 = new Intent(getApplicationContext(), AddSemesterActivity.class);
-                startActivity(anIntent2);
+                intent = new Intent(getApplicationContext(), AddSemesterActivity.class);
+                startActivity(intent);
                 return true;
 
             case R.id.go_to_course:
-                Intent anIntent3 = new Intent(getApplicationContext(), AddCourseActivity.class);
-                startActivity(anIntent3);
+                intent = new Intent(getApplicationContext(), AddCourseActivity.class);
+                startActivity(intent);
                 return true;
 
             default:
-
                 return super.onOptionsItemSelected(item);
-
         }
     }
 }
+
+
