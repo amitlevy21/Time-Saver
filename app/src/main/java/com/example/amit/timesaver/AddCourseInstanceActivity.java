@@ -7,9 +7,12 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
 
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -93,7 +96,7 @@ public class AddCourseInstanceActivity extends BaseActivity implements RadialTim
 
     private void addListeners() {
 
-        /*Bundle bundleFromAddCourses = getIntent().getExtras();
+        Bundle bundleFromAddCourses = getIntent().getExtras();
         final ArrayList<Course> courses = (ArrayList<Course>) bundleFromAddCourses.getSerializable(Keys.COURSES);
         ArrayList<String> coursesNames = new ArrayList<>(courses.size());
         for(Course c : courses) {
@@ -115,7 +118,7 @@ public class AddCourseInstanceActivity extends BaseActivity implements RadialTim
                 choosenCourse = courses.get(0);
                 adapterView.setSelection(0);
             }
-        });*/
+        });
 
         TextView dayTaken = (TextView) findViewById(R.id.day_taken_button);
         dayTaken.setOnClickListener(new View.OnClickListener() {

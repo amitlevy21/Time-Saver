@@ -25,7 +25,8 @@
         <activity android:name=".AddSemesterActivity" />
         <activity android:name=".DashboardActivity" />
         <activity android:name=".SignupActivity" />
-        <activity android:name=".BaseActivity"></activity>
+        <activity android:name=".BaseActivity" />
+        <activity android:name=".TaskManagerActivity"></activity>
     </application>
 
 </manifest>
