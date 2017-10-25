@@ -19,6 +19,10 @@ public class TaskManager {
         return  taskManagerInstance;
     }
 
+    public ArrayList<Task> getPendingTasks() {
+        return pendingTasks;
+    }
+
     public Task getPendingTaskAtIndex(int index) {
         return pendingTasks.get(index);
     }
