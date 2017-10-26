@@ -53,9 +53,6 @@ public class BaseActivity extends AppCompatActivity implements
 
     }
 
-
-
-
     protected void setUpNavView()
     {
         navigationView.setNavigationItemSelectedListener(this);
@@ -100,16 +97,19 @@ public class BaseActivity extends AppCompatActivity implements
         switch (item.getItemId()) {
             case R.id.go_to_dashboard:
                 intent = new Intent(getApplicationContext(), DashboardActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                 startActivity(intent);
                 return true;
 
             case R.id.go_to_semester:
                 intent = new Intent(getApplicationContext(), AddSemesterActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                 startActivity(intent);
                 return true;
 
             case R.id.go_to_course:
                 intent = new Intent(getApplicationContext(), AddCourseActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                 startActivity(intent);
                 return true;
 
@@ -118,5 +118,4 @@ public class BaseActivity extends AppCompatActivity implements
         }
     }
 }
-
 
