@@ -2,11 +2,15 @@ package com.example.amit.timesaver;
 
 import android.support.annotation.NonNull;
 
+import java.io.Serializable;
+
 /**
  * Created by amit on 13/10/17.
  */
 
-public class Task implements Comparable<Task>{
+public class Task implements Comparable<Task>, Serializable{
+
+    private static final long serialVersionUID = 1L;
 
     private Course relatedCourse;
     private MyDate dueDate;

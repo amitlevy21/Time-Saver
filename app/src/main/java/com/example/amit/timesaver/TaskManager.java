@@ -41,6 +41,10 @@ public class TaskManager {
         pendingTasks.get(index).markAsUndone();
     }
 
+    public void addTask(Task task) {
+        pendingTasks.add(task);
+    }
+
     public void sortTasksByDate() {
        Collections.sort(pendingTasks, new TaskComparator());
     }

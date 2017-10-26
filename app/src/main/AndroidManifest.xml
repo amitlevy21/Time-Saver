@@ -26,7 +26,8 @@
         <activity android:name=".DashboardActivity" />
         <activity android:name=".SignupActivity" />
         <activity android:name=".BaseActivity" />
-        <activity android:name=".AddCourseInstanceActivity"/>
+        <activity android:name=".AddCourseInstanceActivity" />
+        <activity android:name=".AddTaskActivity"></activity>
     </application>
 
 </manifest>

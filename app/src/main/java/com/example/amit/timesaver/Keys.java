@@ -10,5 +10,7 @@ class Keys {
     public static final String USER_INFO = "user_info_key";
     public static final String COURSE_INSTANCES = "course_instances_key";
     public static final String COURSES = "courses_key";
+    public static final String SEMESTER = "semester_key";
+    public static final String TASK_ADDED = "task_key";
     public static String SEMESTERS = "semesters_key";
 }

@@ -38,6 +38,18 @@ public class Semester implements Serializable{
             numOfCourses--;
     }
 
+    public Course getCourseByName (String courseName) {
+        for (Course course : courses) {
+            if (course.getName().equals(courseName))
+                return course;
+        }
+        return null;
+    }
+
+    public ArrayList<Course> getCourses() {
+        return courses;
+    }
+
     public int getYear() {
         return year;
     }
