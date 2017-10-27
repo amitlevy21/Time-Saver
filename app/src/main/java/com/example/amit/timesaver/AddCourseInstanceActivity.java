@@ -36,6 +36,8 @@ public class AddCourseInstanceActivity extends BaseActivity implements RadialTim
     private int chosenEndHour;
     private String chosenProfessorName;
     private ArrayList<CourseInstance> courseInstances = new ArrayList<>();
+    private ArrayList<Course> courses = new ArrayList<>();
+    private String temp;
 
 
     private static final String FRAG_TAG_TIME_PICKER_START = "timePickerDialogFragmentStart";
@@ -55,8 +57,21 @@ public class AddCourseInstanceActivity extends BaseActivity implements RadialTim
         buildDrawer(ADD_INSTANCE_DRAWER_POSITION);
         DrawerLayout.LayoutParams dlp  = (DrawerLayout.LayoutParams)findViewById(R.id.activity_add_instance).getLayoutParams();
         dlp.setMargins(50,50,50,50);
+        if(getIntent().getSerializableExtra(Keys.COURSES) != null)
+            courses = (ArrayList<Course>) getIntent().getSerializableExtra(Keys.COURSES);
 
-        addListeners();
+        ArrayList<String> coursesNames = new ArrayList<>();
+        for (int i = 0; i < courses.size(); i++) {
+            if(!(courses.get(i).getName().compareTo("") == 0)) {
+                temp = courses.get(i).getName();
+                coursesNames.add(temp);
+            }
+        }
+
+
+        addListeners(coursesNames);
+
+
     }
 
     @Override
@@ -98,17 +113,12 @@ public class AddCourseInstanceActivity extends BaseActivity implements RadialTim
     }
 
 
-    private void addListeners() {
+    private void addListeners(ArrayList<String> coursesNames) {
 
-        Bundle bundleFromAddCourses = getIntent().getExtras();
-        final ArrayList<Course> courses = (ArrayList<Course>) bundleFromAddCourses.getSerializable(Keys.COURSES);
-        ArrayList<String> coursesNames = new ArrayList<>(courses.size());
-        for(Course c : courses) {
-            coursesNames.add(c.getName());
-        }
+
         final ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, coursesNames);
 
-        Spinner spinCourses = (Spinner)findViewById(R.id.year_spinner);
+        Spinner spinCourses = (Spinner)findViewById(R.id.course_spinner);
         spinCourses.setAdapter(adapter);
         spinCourses.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override

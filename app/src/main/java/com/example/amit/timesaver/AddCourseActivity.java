@@ -114,16 +114,16 @@ public class AddCourseActivity extends BaseActivity {
     }
 
     private void putInArray(String courseName, String semesterSelected) {
-        int semesterYear = Integer.parseInt(semesterSelected.substring(0, 3));
+        int semesterYear = Integer.parseInt(semesterSelected.substring(0, 4));
         char semesterType = semesterSelected.charAt(7);
         for (int i = 0; i < semesters.size(); i++) {
             if ((semesters.get(i).getYear() == semesterYear) &&
-                    (semesters.get(i).getSemesterTypeArr().toString().compareTo(Character.toString(semesterType)) == 0)){
+                    (semesters.get(i).getSemesterTypeArr().toString().compareTo(Character.toString(semesterType)) == 0)) {
                 course = new Course(courseName, semesters.get(i));
                 break;
             }
-            courses.add(course);
         }
+            courses.add(course);
     }
 }
 
