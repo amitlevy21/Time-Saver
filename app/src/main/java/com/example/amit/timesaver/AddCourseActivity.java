@@ -13,6 +13,7 @@ public class AddCourseActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_course);
 
+        buildDrawer();
 
     }
 }

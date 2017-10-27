@@ -29,6 +29,8 @@ public class TaskManagerActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_task_manager);
 
+        buildDrawer();
+
         taskManager = TaskManager.getInstance();
         recyclerView = (RecyclerView) findViewById(R.id.task_manager_recycler_view);
         taskList = taskManager.getPendingTasks();

@@ -51,6 +51,7 @@ public class AddCourseInstanceActivity extends BaseActivity implements RadialTim
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_instance);
 
+        buildDrawer();
 
         addListeners();
     }

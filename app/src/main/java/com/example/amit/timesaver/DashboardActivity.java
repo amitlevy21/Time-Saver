@@ -6,7 +6,6 @@ import android.widget.TableRow;
 import android.widget.TextView;
 
 
-
 public class DashboardActivity extends BaseActivity {
 
     private Dashboard dashboard = Dashboard.getInstance();
@@ -16,6 +15,8 @@ public class DashboardActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dashboard);
+
+        buildDrawer();
 
         int[] quantityToday = {dashboard.getNumOfTodaysTasksDue(), dashboard.getNumOfTodaysClasses(), dashboard.getNumOfTotalTasksDone()};
         int[] quantityTomorrow = {dashboard.getNumOfTomorrowsTasksDue(), dashboard.getNumOfTomorrowsClasses()};

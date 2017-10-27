@@ -12,7 +12,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".TaskManagerActivity"
+            android:name=".DashboardActivity"
             android:theme="@style/splashScreenTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -20,14 +20,14 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".AddCourseActivity" />
+        <activity android:name=".AddCourseActivity" android:launchMode="singleTask"/>
         <activity android:name=".LoginActivity" />
-        <activity android:name=".AddSemesterActivity" />
-        <activity android:name=".DashboardActivity" />
+        <activity android:name=".AddSemesterActivity" android:launchMode="singleTask"/>
+        <activity android:name=".TaskManagerActivity" android:launchMode="singleTask"/>
         <activity android:name=".SignupActivity" />
         <activity android:name=".BaseActivity" />
-        <activity android:name=".AddCourseInstanceActivity" />
-        <activity android:name=".AddTaskActivity"></activity>
+        <activity android:name=".AddCourseInstanceActivity" android:launchMode="singleTask"/>
+        <activity android:name=".AddTaskActivity" android:launchMode="singleTask"/>
     </application>
 
 </manifest>
