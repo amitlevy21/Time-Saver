@@ -34,6 +34,8 @@ public class AddSemesterActivity extends BaseActivity implements CalendarDatePic
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_semester);
 
+        buildDrawer();
+
         ArrayList<String> years = new ArrayList<>();
         int thisYear = Calendar.getInstance().get(Calendar.YEAR);
         for (int i = 1970; i <= thisYear + 10; i++) {
@@ -41,6 +43,8 @@ public class AddSemesterActivity extends BaseActivity implements CalendarDatePic
         }
 
         setListeners(years);
+
+
 
     }
 

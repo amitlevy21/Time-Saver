@@ -1,122 +1,93 @@
 package com.example.amit.timesaver;
 
 import android.content.Intent;
-import android.support.design.widget.NavigationView;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
-import android.view.MenuItem;
 import android.view.View;
-import android.widget.FrameLayout;
 
-public class BaseActivity extends AppCompatActivity implements
-        NavigationView.OnNavigationItemSelectedListener{
+import com.mikepenz.materialdrawer.Drawer;
+import com.mikepenz.materialdrawer.DrawerBuilder;
+import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
+import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
+import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 
-    private NavigationView navigationView;
-    private DrawerLayout fullLayout;
-    private Toolbar toolbar;
-    private ActionBarDrawerToggle drawerToggle;
-    private int selectedNavItemId;
 
+public class BaseActivity extends AppCompatActivity {
+
+    DrawerBuilder drawerBuilder;
+    Drawer drawer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         setTheme(R.style.AppTheme);
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_base);
+
+
+
+        drawerBuilder = new DrawerBuilder().withActivity(this)
+                .withDisplayBelowStatusBar(false)
+                .withTranslucentStatusBar(false)
+                .withDrawerLayout(R.layout.material_drawer_fits_not)
+                .addDrawerItems(
+                        new PrimaryDrawerItem().withName("Dashboard").withIcon(R.drawable.dashboard_menu_ic),
+                        new PrimaryDrawerItem().withName("Task Manager").withIcon(R.drawable.task_manager_menu_ic),
+                        new SecondaryDrawerItem().withName("Add Semester").withIcon(R.drawable.semester_menu_ic),
+                        new SecondaryDrawerItem().withName("Add Course").withIcon(R.drawable.course_menu_ic),
+                        new SecondaryDrawerItem().withName("Add Course Instance").withIcon(R.drawable.instance_menu_ic)
+
+                )
+                .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
+                    @Override
+                    public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+                        if (drawerItem != null) {
+
+                            Intent intent = null;
+                            switch (position) {
+                                case 0: {
+                                    intent = new Intent(BaseActivity.this, DashboardActivity.class);
+                                    break;
+                                }
+                                case 1: {
+                                    intent = new Intent(BaseActivity.this, TaskManagerActivity.class);
+                                    break;
+                                }
+                                case 2: {
+                                    intent = new Intent(BaseActivity.this, AddSemesterActivity.class);
+                                    break;
+                                }
+                                case 3: {
+                                    intent = new Intent(BaseActivity.this, AddCourseActivity.class);
+                                    break;
+                                }
+                                case 4: {
+                                    intent = new Intent(BaseActivity.this, AddCourseInstanceActivity.class);
+                                    break;
+                                }
+                            }
+                            if (intent != null) {
+                                BaseActivity.this.startActivity(intent);
+                            }
+
+                        }
+                        return false;
+                    }
+                });
+
 
     }
 
+    protected void buildDrawer() {
+        drawer = drawerBuilder.build();
+    }
+
     @Override
-    public void setContentView(int layoutResID) {
-
-        fullLayout = (DrawerLayout) getLayoutInflater().inflate(R.layout.activity_base, null);
-
-        FrameLayout activityContainer = (FrameLayout) fullLayout.findViewById(R.id.activity_content);
-        getLayoutInflater().inflate(layoutResID, activityContainer, true);
-
-
-        super.setContentView(fullLayout);
-
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
-        navigationView = (NavigationView) findViewById(R.id.navigationView);
-
-        if (useToolbar()) {
-            setSupportActionBar(toolbar);
+    public void onBackPressed() {
+        if (drawer != null && drawer.isDrawerOpen()) {
+            drawer.closeDrawer();
         } else {
-            toolbar.setVisibility(View.GONE);
-        }
-
-        setUpNavView();
-
-    }
-
-
-
-
-    protected void setUpNavView()
-    {
-        navigationView.setNavigationItemSelectedListener(this);
-
-        if( useDrawerToggle()) { // use the hamburger menu
-            drawerToggle = new ActionBarDrawerToggle(this, fullLayout, toolbar,
-                    R.string.drawer_open,
-                    R.string.drawer_closed);
-
-            fullLayout.setDrawerListener(drawerToggle);
-            drawerToggle.syncState();
-        } else if(useToolbar() && getSupportActionBar() != null) {
-            // Use home/back button instead
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setHomeAsUpIndicator(getResources()
-                    .getDrawable(R.drawable.bp_material_button_background));
-        }
-    }
-
-    protected boolean useDrawerToggle()
-    {
-        return true;
-    }
-
-    @Override
-    public boolean onNavigationItemSelected(MenuItem menuItem) {
-        fullLayout.closeDrawer(GravityCompat.START);
-        selectedNavItemId = menuItem.getItemId();
-
-        return onOptionsItemSelected(menuItem);
-    }
-
-    protected boolean useToolbar() {
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        Intent intent;
-
-
-        switch (item.getItemId()) {
-            case R.id.go_to_dashboard:
-                intent = new Intent(getApplicationContext(), DashboardActivity.class);
-                startActivity(intent);
-                return true;
-
-            case R.id.go_to_semester:
-                intent = new Intent(getApplicationContext(), AddSemesterActivity.class);
-                startActivity(intent);
-                return true;
-
-            case R.id.go_to_course:
-                intent = new Intent(getApplicationContext(), AddCourseActivity.class);
-                startActivity(intent);
-                return true;
-
-            default:
-                return super.onOptionsItemSelected(item);
+            super.onBackPressed();
         }
     }
 }
-
 

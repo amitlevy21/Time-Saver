@@ -1,25 +1,14 @@
 package com.example.amit.timesaver;
 
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 
-import android.widget.EditText;
-import android.widget.Spinner;
-import android.widget.Toast;
-
-
-import java.util.ArrayList;
 
 import java.util.List;
 
@@ -40,6 +29,8 @@ public class TaskManagerActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_task_manager);
 
+        buildDrawer();
+
         taskManager = TaskManager.getInstance();
         recyclerView = (RecyclerView) findViewById(R.id.task_manager_recycler_view);
         taskList = taskManager.getPendingTasks();
@@ -50,19 +41,6 @@ public class TaskManagerActivity extends BaseActivity {
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(tasksAdapter);
 
-        recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getApplicationContext(), recyclerView, new ClickListener() {
-            @Override
-            public void onClick(View view, int position) {
-                Task task = taskList.get(position);
-                // TODO: 10/25/2017 call dialog to edit task
-                Toast.makeText(getApplicationContext(), task.getDescription() + " is selected!", Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onLongClick(View view, int position) {
-
-            }
-        }));
 
         //to delete
         semesterRelated = new Semester(1994, new MyDate(1994,12,28), new MyDate(1995,12,28), Semester.eSemesterType.A);
