@@ -4,6 +4,7 @@ package com.example.amit.timesaver;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -29,7 +30,10 @@ public class TaskManagerActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_task_manager);
 
-        buildDrawer();
+        buildDrawer(TASK_MANAGER_DRAWER_POSITION);
+        DrawerLayout.LayoutParams dlp  = (DrawerLayout.LayoutParams)findViewById(R.id.activity_task_manager).getLayoutParams();
+        dlp.setMargins(50,50,50,50);
+
 
         taskManager = TaskManager.getInstance();
         recyclerView = (RecyclerView) findViewById(R.id.task_manager_recycler_view);
@@ -78,9 +82,11 @@ public class TaskManagerActivity extends BaseActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Bundle taskAddedBundle = data.getExtras();
-        Task task =(Task) taskAddedBundle.getSerializable(Keys.TASK_ADDED);
-        taskList.add(task);
-        tasksAdapter.notifyDataSetChanged();
+        if(data != null) { // data can be null if user pressed back
+            Bundle taskAddedBundle = data.getExtras();
+            Task task = (Task) taskAddedBundle.getSerializable(Keys.TASK_ADDED);
+            taskList.add(task);
+            tasksAdapter.notifyDataSetChanged();
+        }
     }
 }

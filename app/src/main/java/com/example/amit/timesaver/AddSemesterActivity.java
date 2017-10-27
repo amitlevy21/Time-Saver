@@ -4,6 +4,7 @@ import java.util.Calendar;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.widget.DrawerLayout;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -34,7 +35,9 @@ public class AddSemesterActivity extends BaseActivity implements CalendarDatePic
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_semester);
 
-        buildDrawer();
+        buildDrawer(ADD_SEMESTER_DRAWER_POSITION);
+        DrawerLayout.LayoutParams dlp  = (DrawerLayout.LayoutParams)findViewById(R.id.activity_add_semester).getLayoutParams();
+        dlp.setMargins(50,50,50,50);
 
         ArrayList<String> years = new ArrayList<>();
         int thisYear = Calendar.getInstance().get(Calendar.YEAR);

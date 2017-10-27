@@ -1,24 +1,18 @@
 package com.example.amit.timesaver;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v4.widget.DrawerLayout;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.codetroopers.betterpickers.calendardatepicker.CalendarDatePickerDialogFragment;
-
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Iterator;
-import java.util.List;
 
 
 public class AddCourseActivity extends BaseActivity {
@@ -27,12 +21,16 @@ public class AddCourseActivity extends BaseActivity {
     private ArrayList<Course> courses = new ArrayList<>();
     private Course course;
     private Semester semester;
-    private String semsterSelected = "";
+    private String semesterSelected = "";
     private String temp;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_course);
+
+        buildDrawer(ADD_COURSE_DRAWER_POSITION);
+        DrawerLayout.LayoutParams dlp  = (DrawerLayout.LayoutParams)findViewById(R.id.activity_add_course).getLayoutParams();
+        dlp.setMargins(50,50,50,50);
 
         ArrayList<String> semestersSpinner = new ArrayList<>();
         if(getIntent().getSerializableExtra(Keys.SEMESTERS) != null)
@@ -56,13 +54,13 @@ public class AddCourseActivity extends BaseActivity {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 adapterView.setSelection(i);
-                semsterSelected = adapterView.getSelectedItem().toString();
+                semesterSelected = adapterView.getSelectedItem().toString();
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> adapterView) {
                 adapterView.setSelection(adapterView.getLastVisiblePosition());
-                semsterSelected = adapterView.getSelectedItem().toString();
+                semesterSelected = adapterView.getSelectedItem().toString();
             }
         });
 
@@ -82,7 +80,7 @@ public class AddCourseActivity extends BaseActivity {
                 EditText txtDescription = (EditText) findViewById(R.id.course_name_input);
                 String courseName = txtDescription.getText().toString();
                 if (checkInput(courseName)) {
-                    putInArray(courseName, semsterSelected);
+                    putInArray(courseName, semesterSelected);
 
                     Intent intentEnterCourses = new Intent(getApplicationContext(), AddCourseInstanceActivity.class);
                     intentEnterCourses.putExtra(Keys.COURSES, courses);
@@ -99,7 +97,7 @@ public class AddCourseActivity extends BaseActivity {
                 EditText txtDescription = (EditText) findViewById(R.id.course_name_input);
                 String courseName = txtDescription.getText().toString();
                 if (checkInput(courseName)) {
-                    putInArray(courseName, semsterSelected);
+                    putInArray(courseName, semesterSelected);
                     Toast.makeText(getApplicationContext(), "Course successfully added!", Toast.LENGTH_LONG).show();
                 }
             }
@@ -109,7 +107,7 @@ public class AddCourseActivity extends BaseActivity {
 
     private boolean checkInput(String courseName) {
         if(!(courseName.compareTo("") == 0) &&
-                !(semsterSelected.compareTo("") == 0))
+                !(semesterSelected.compareTo("") == 0))
             return true;
         Toast.makeText(getApplicationContext(), "you should enter a course name!", Toast.LENGTH_LONG).show();
         return false;

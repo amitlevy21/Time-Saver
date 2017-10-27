@@ -55,5 +55,6 @@
         <item>C</item>
     </string-array>
     <string name="title_activity_base">BaseActivity</string>
+    <string name="task_manager_headline">Task Manager</string>
 
 </resources>

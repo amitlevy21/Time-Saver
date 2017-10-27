@@ -3,6 +3,7 @@ package com.example.amit.timesaver;
 import android.content.Intent;
 
 import android.os.Bundle;
+import android.support.v4.widget.DrawerLayout;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
@@ -29,11 +30,11 @@ public class AddCourseInstanceActivity extends BaseActivity implements RadialTim
         CalendarDatePickerDialogFragment.OnDateSetListener{
 
 
-    private Course choosenCourse;
-    private eDay choosenDay;
-    private int choosenStartHour;
-    private int choosenEndHour;
-    private String choosenProfessorName;
+    private Course chosenCourse;
+    private eDay chosenDay;
+    private int chosenStartHour;
+    private int chosenEndHour;
+    private String chosenProfessorName;
     private ArrayList<CourseInstance> courseInstances = new ArrayList<>();
 
 
@@ -51,7 +52,9 @@ public class AddCourseInstanceActivity extends BaseActivity implements RadialTim
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_instance);
 
-        buildDrawer();
+        buildDrawer(ADD_INSTANCE_DRAWER_POSITION);
+        DrawerLayout.LayoutParams dlp  = (DrawerLayout.LayoutParams)findViewById(R.id.activity_add_instance).getLayoutParams();
+        dlp.setMargins(50,50,50,50);
 
         addListeners();
     }
@@ -61,14 +64,14 @@ public class AddCourseInstanceActivity extends BaseActivity implements RadialTim
 
         switch (dialog.getTag()) {
             case FRAG_TAG_TIME_PICKER_START: {
-                choosenStartHour = hourOfDay * 100 + minute;
+                chosenStartHour = hourOfDay * 100 + minute;
                 TextView startHourButton = (TextView) findViewById(R.id.start_hour_button);
                 startHourButton.setText(hourOfDay + ":" + minute);
                 break;
             }
             case FRAG_TAG_TIME_PICKER_END: {
-                if(choosenEndHour * 100 + minute > choosenStartHour) {
-                    choosenEndHour = hourOfDay * 100 + minute;
+                if(chosenEndHour * 100 + minute > chosenStartHour) {
+                    chosenEndHour = hourOfDay * 100 + minute;
                     TextView endHourButton = (TextView) findViewById(R.id.end_hour_button);
                     endHourButton.setText(hourOfDay + ":" + minute);
                 } else {
@@ -88,9 +91,9 @@ public class AddCourseInstanceActivity extends BaseActivity implements RadialTim
 
         int dayOfWeek = myCalendar.get(Calendar.DAY_OF_WEEK);
 
-        choosenDay = eDay.values()[dayOfWeek - 1];
+        chosenDay = eDay.values()[dayOfWeek - 1];
         TextView dayTaken = (TextView) findViewById(R.id.day_taken_button);
-        dayTaken.setText(choosenDay.name());
+        dayTaken.setText(chosenDay.name());
 
     }
 
@@ -110,13 +113,13 @@ public class AddCourseInstanceActivity extends BaseActivity implements RadialTim
         spinCourses.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                choosenCourse = courses.get(i);
+                chosenCourse = courses.get(i);
                 adapterView.setSelection(i);
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> adapterView) {
-                choosenCourse = courses.get(0);
+                chosenCourse = courses.get(0);
                 adapterView.setSelection(0);
             }
         });
@@ -171,7 +174,7 @@ public class AddCourseInstanceActivity extends BaseActivity implements RadialTim
 
             @Override
             public void afterTextChanged(Editable editable) {
-                choosenProfessorName = editable.toString();
+                chosenProfessorName = editable.toString();
             }
         });
 
@@ -199,13 +202,13 @@ public class AddCourseInstanceActivity extends BaseActivity implements RadialTim
     }
 
     private boolean checkInputBeforeNextActivity() {
-        if (choosenCourse != null && choosenDay != null && choosenStartHour != choosenEndHour) {
+        if (chosenCourse != null && chosenDay != null && chosenStartHour != chosenEndHour) {
             CourseInstance courseInstance;
-            if (choosenProfessorName != null) {
+            if (chosenProfessorName != null) {
                 courseInstance = new CourseInstance
-                        (choosenCourse, choosenDay.ordinal(), choosenStartHour, choosenEndHour, choosenProfessorName);
+                        (chosenCourse, chosenDay.ordinal(), chosenStartHour, chosenEndHour, chosenProfessorName);
             } else {
-                courseInstance = new CourseInstance(choosenCourse, choosenDay.ordinal(), choosenStartHour, choosenEndHour);
+                courseInstance = new CourseInstance(chosenCourse, chosenDay.ordinal(), chosenStartHour, chosenEndHour);
             }
             courseInstances.add(courseInstance);
             return true;

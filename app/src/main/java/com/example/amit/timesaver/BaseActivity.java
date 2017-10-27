@@ -14,15 +14,22 @@ import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 
 public class BaseActivity extends AppCompatActivity {
 
+    protected static final int DASHBOARD_DRAWER_POSITION = 0;
+    protected static final int TASK_MANAGER_DRAWER_POSITION = 1;
+    protected static final int ADD_SEMESTER_DRAWER_POSITION = 2;
+    protected static final int ADD_COURSE_DRAWER_POSITION = 3;
+    protected static final int ADD_INSTANCE_DRAWER_POSITION = 4;
+
     DrawerBuilder drawerBuilder;
     Drawer drawer;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         setTheme(R.style.AppTheme);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_base);
-
 
 
         drawerBuilder = new DrawerBuilder().withActivity(this)
@@ -44,23 +51,23 @@ public class BaseActivity extends AppCompatActivity {
 
                             Intent intent = null;
                             switch (position) {
-                                case 0: {
+                                case DASHBOARD_DRAWER_POSITION: {
                                     intent = new Intent(BaseActivity.this, DashboardActivity.class);
                                     break;
                                 }
-                                case 1: {
+                                case TASK_MANAGER_DRAWER_POSITION: {
                                     intent = new Intent(BaseActivity.this, TaskManagerActivity.class);
                                     break;
                                 }
-                                case 2: {
+                                case ADD_SEMESTER_DRAWER_POSITION: {
                                     intent = new Intent(BaseActivity.this, AddSemesterActivity.class);
                                     break;
                                 }
-                                case 3: {
+                                case ADD_COURSE_DRAWER_POSITION: {
                                     intent = new Intent(BaseActivity.this, AddCourseActivity.class);
                                     break;
                                 }
-                                case 4: {
+                                case ADD_INSTANCE_DRAWER_POSITION: {
                                     intent = new Intent(BaseActivity.this, AddCourseInstanceActivity.class);
                                     break;
                                 }
@@ -77,8 +84,9 @@ public class BaseActivity extends AppCompatActivity {
 
     }
 
-    protected void buildDrawer() {
+    protected void buildDrawer(int selection) {
         drawer = drawerBuilder.build();
+        drawer.setSelection(selection);
     }
 
     @Override
