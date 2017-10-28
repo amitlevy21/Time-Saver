@@ -37,12 +37,13 @@ public class AddCourseInstanceActivity extends BaseActivity implements RadialTim
     private String chosenProfessorName;
     private ArrayList<CourseInstance> courseInstances = new ArrayList<>();
     private ArrayList<Course> courses = new ArrayList<>();
-    private String temp;
 
 
     private static final String FRAG_TAG_TIME_PICKER_START = "timePickerDialogFragmentStart";
     private static final String FRAG_TAG_TIME_PICKER_END = "timePickerDialogFragmentEnd";
     private static final String FRAG_DATE_PICKER = "datePickerDialogFragment";
+    private ArrayList<String> coursesNames;
+
 
     private enum eDay {
         SUNDAY, MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY
@@ -54,24 +55,39 @@ public class AddCourseInstanceActivity extends BaseActivity implements RadialTim
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_instance);
 
-        buildDrawer(ADD_INSTANCE_DRAWER_POSITION);
+        buildDrawer();
         DrawerLayout.LayoutParams dlp  = (DrawerLayout.LayoutParams)findViewById(R.id.activity_add_instance).getLayoutParams();
         dlp.setMargins(50,50,50,50);
+
+        addListeners();
+
+    }
+
+    //added because of activity launchMode is SingleTop
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        //now getIntent() should always return the last received intent
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
         if(getIntent().getSerializableExtra(Keys.COURSES) != null)
             courses = (ArrayList<Course>) getIntent().getSerializableExtra(Keys.COURSES);
 
-        ArrayList<String> coursesNames = new ArrayList<>();
+        coursesNames = new ArrayList<>();
         for (int i = 0; i < courses.size(); i++) {
-            if(!(courses.get(i).getName().compareTo("") == 0)) {
-                temp = courses.get(i).getName();
-                coursesNames.add(temp);
-            }
+            String temp = courses.get(i).getName();
+            coursesNames.add(temp);
+
         }
 
-
-        addListeners(coursesNames);
-
-
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, coursesNames);
+        Spinner spinCourses = (Spinner)findViewById(R.id.course_spinner);
+        spinCourses.setAdapter(adapter);
     }
 
     @Override
@@ -81,14 +97,14 @@ public class AddCourseInstanceActivity extends BaseActivity implements RadialTim
             case FRAG_TAG_TIME_PICKER_START: {
                 chosenStartHour = hourOfDay * 100 + minute;
                 TextView startHourButton = (TextView) findViewById(R.id.start_hour_button);
-                startHourButton.setText(hourOfDay + ":" + minute);
+                startHourButton.setText(String.valueOf(chosenStartHour));
                 break;
             }
             case FRAG_TAG_TIME_PICKER_END: {
-                if(chosenEndHour * 100 + minute > chosenStartHour) {
+                if(hourOfDay * 100 + minute > chosenStartHour) {
                     chosenEndHour = hourOfDay * 100 + minute;
                     TextView endHourButton = (TextView) findViewById(R.id.end_hour_button);
-                    endHourButton.setText(hourOfDay + ":" + minute);
+                    endHourButton.setText(String.valueOf(chosenEndHour));
                 } else {
                     Toast.makeText(getApplicationContext(), "Please choose valid hours", Toast.LENGTH_LONG).show();
                 }
@@ -113,13 +129,10 @@ public class AddCourseInstanceActivity extends BaseActivity implements RadialTim
     }
 
 
-    private void addListeners(ArrayList<String> coursesNames) {
-
-
-        final ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, coursesNames);
+    private void addListeners() {
 
         Spinner spinCourses = (Spinner)findViewById(R.id.course_spinner);
-        spinCourses.setAdapter(adapter);
+
         spinCourses.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
@@ -212,7 +225,7 @@ public class AddCourseInstanceActivity extends BaseActivity implements RadialTim
     }
 
     private boolean checkInputBeforeNextActivity() {
-        if (chosenCourse != null && chosenDay != null && chosenStartHour != chosenEndHour) {
+        if (chosenCourse != null && chosenDay != null && chosenStartHour != chosenEndHour && chosenStartHour != 0 && chosenEndHour != 0) {
             CourseInstance courseInstance;
             if (chosenProfessorName != null) {
                 courseInstance = new CourseInstance

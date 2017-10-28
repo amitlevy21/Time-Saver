@@ -35,7 +35,7 @@ public class AddSemesterActivity extends BaseActivity implements CalendarDatePic
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_semester);
 
-        buildDrawer(ADD_SEMESTER_DRAWER_POSITION);
+        buildDrawer();
         DrawerLayout.LayoutParams dlp  = (DrawerLayout.LayoutParams)findViewById(R.id.activity_add_semester).getLayoutParams();
         dlp.setMargins(50,50,50,50);
 
@@ -46,8 +46,6 @@ public class AddSemesterActivity extends BaseActivity implements CalendarDatePic
         }
 
         setListeners(years);
-
-
 
     }
 

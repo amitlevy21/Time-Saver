@@ -30,7 +30,7 @@ public class TaskManagerActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_task_manager);
 
-        buildDrawer(TASK_MANAGER_DRAWER_POSITION);
+        buildDrawer();
         DrawerLayout.LayoutParams dlp  = (DrawerLayout.LayoutParams)findViewById(R.id.activity_task_manager).getLayoutParams();
         dlp.setMargins(50,50,50,50);
 

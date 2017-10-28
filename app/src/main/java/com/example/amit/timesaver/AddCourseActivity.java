@@ -9,7 +9,6 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -21,35 +20,54 @@ public class AddCourseActivity extends BaseActivity {
     private ArrayList<Course> courses = new ArrayList<>();
     private Course course;
     private Semester semester;
-    private String semesterSelected = "";
-    private String temp;
+    private String semesterSelected;
+    private ArrayList<String> semestersSpinner;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_course);
 
-        buildDrawer(ADD_COURSE_DRAWER_POSITION);
+        buildDrawer();
         DrawerLayout.LayoutParams dlp  = (DrawerLayout.LayoutParams)findViewById(R.id.activity_add_course).getLayoutParams();
         dlp.setMargins(50,50,50,50);
 
-        ArrayList<String> semestersSpinner = new ArrayList<>();
-        if(getIntent().getSerializableExtra(Keys.SEMESTERS) != null)
-        semesters = (ArrayList<Semester>) getIntent().getSerializableExtra(Keys.SEMESTERS);
+        semestersSpinner = new ArrayList<>();
 
-        for (int i = 0; i < semesters.size(); i++) {
-            temp = semesters.get(i).getYear() + " - " + semesters.get(i).getSemesterTypeArr();
-            semestersSpinner.add(temp);
-        }
-
-        setListeners(semestersSpinner);
+        setListeners();
     }
 
-    private void setListeners(ArrayList<String> semestersSpinner) {
+    //added because of activity launchMode is SingleTop
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        //now getIntent() should always return the last received intent
+    }
 
-        final ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, semestersSpinner);
+    @Override
+    protected void onResume() {
+        super.onResume();
 
+        if(getIntent().getSerializableExtra(Keys.SEMESTERS) != null)
+            semesters = (ArrayList<Semester>) getIntent().getSerializableExtra(Keys.SEMESTERS);
+
+        for (int i = 0; i < semesters.size(); i++) {
+            String semesterNameFormat = semesters.get(i).getYear() + " - " + semesters.get(i).getSemesterTypeArr();
+            semestersSpinner.add(semesterNameFormat);
+        }
+
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, semestersSpinner);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         Spinner spinSemester = (Spinner) findViewById(R.id.semester_spinner);
         spinSemester.setAdapter(adapter);
+
+    }
+
+    private void setListeners() {
+
+        Spinner spinSemester = (Spinner) findViewById(R.id.semester_spinner);
         spinSemester.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
@@ -64,13 +82,6 @@ public class AddCourseActivity extends BaseActivity {
             }
         });
 
-        TextView courseName = (TextView) findViewById(R.id.course_name_input);
-        courseName.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-            }
-        });
 
         Button confirmCourseButton = (Button) findViewById(R.id.button_confirm_add_course);
         confirmCourseButton.setOnClickListener(new View.OnClickListener() {
