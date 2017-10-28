@@ -1,7 +1,6 @@
 package com.example.amit.timesaver;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -50,6 +49,11 @@ public class AddTaskActivity extends BaseActivity implements CalendarDatePickerD
 
         coursesSpinner.setSelection(0);
 
+        addListeners(coursesSpinner);
+
+    }
+
+    private void addListeners(Spinner coursesSpinner) {
         coursesSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {

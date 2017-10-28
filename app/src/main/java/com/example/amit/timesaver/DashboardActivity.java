@@ -2,8 +2,6 @@ package com.example.amit.timesaver;
 
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
-import android.widget.FrameLayout;
-import android.widget.RelativeLayout;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -24,6 +22,15 @@ public class DashboardActivity extends BaseActivity {
         DrawerLayout.LayoutParams dlp  = (DrawerLayout.LayoutParams)findViewById(R.id.activity_dashboard).getLayoutParams();
         dlp.setMargins(50,50,50,50);
 
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        updateStats();
+    }
+
+    private void updateStats() {
         int[] quantityToday = {dashboard.getNumOfTodaysTasksDue(), dashboard.getNumOfTodaysClasses(), dashboard.getNumOfTotalTasksDone()};
         int[] quantityTomorrow = {dashboard.getNumOfTomorrowsTasksDue(), dashboard.getNumOfTomorrowsClasses()};
 
@@ -43,7 +50,5 @@ public class DashboardActivity extends BaseActivity {
             TextView textView = (TextView) row.getChildAt(1);
             textView.setText(String.valueOf(quantityToday[i]));
         }
-
-
     }
 }

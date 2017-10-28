@@ -18,9 +18,8 @@ import com.google.android.gms.tasks.*;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
+
+import java.util.HashMap;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -40,7 +39,7 @@ public class SignupActivity extends AppCompatActivity {
     TextView _loginLink;
 
     private FirebaseAuth mAuth;
-
+    private ProgressDialog progressDialog;
 
 
     @Override
@@ -77,7 +76,7 @@ public class SignupActivity extends AppCompatActivity {
 
         _signupButton.setEnabled(false);
 
-        final ProgressDialog progressDialog = new ProgressDialog(SignupActivity.this,
+        progressDialog = new ProgressDialog(SignupActivity.this,
                 AlertDialog.THEME_DEVICE_DEFAULT_DARK);
         progressDialog.setIndeterminate(true);
         progressDialog.setMessage("Creating Account...");
@@ -97,7 +96,10 @@ public class SignupActivity extends AppCompatActivity {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "createUserWithEmail:success");
 
-                            onSignupSuccess(new MyUserInfo(email, name));
+                            MyUserInfo info = new MyUserInfo(email,name);
+                            info.setFullName(name);
+                            info.setEmail(email);
+                            onSignupSuccess(info);
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "createUserWithEmail:failure", task.getException());
@@ -114,8 +116,9 @@ public class SignupActivity extends AppCompatActivity {
     public void onSignupSuccess(MyUserInfo myUserInfo) {
         _signupButton.setEnabled(true);
         Intent intent = new Intent();
-        intent.putExtra(Keys.USER_INFO, myUserInfo);
         setResult(RESULT_OK, intent);
+        intent.putExtra(Keys.USER_INFO, myUserInfo);
+        progressDialog.dismiss();
         finish();
     }
 

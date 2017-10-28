@@ -12,7 +12,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".DashboardActivity"
+            android:name=".LoginActivity"
             android:theme="@style/splashScreenTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -21,7 +21,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".AddCourseActivity" android:launchMode="singleTop"/>
-        <activity android:name=".LoginActivity" />
+        <activity android:name=".DashboardActivity" android:launchMode="singleTop"/>
         <activity android:name=".AddSemesterActivity" android:launchMode="singleTop"/>
         <activity android:name=".TaskManagerActivity" android:launchMode="singleTop"/>
         <activity android:name=".SignupActivity" />

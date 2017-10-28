@@ -22,7 +22,8 @@ class MyDate implements Comparable<MyDate> , Serializable{
         this.day = day;
     }
 
-
+    public MyDate() {
+    }
 
     public int getYear() {
         return year;

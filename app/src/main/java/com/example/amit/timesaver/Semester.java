@@ -1,5 +1,8 @@
 package com.example.amit.timesaver;
 
+
+import android.support.annotation.NonNull;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 
@@ -10,6 +13,7 @@ import java.util.ArrayList;
 
 public class Semester implements Serializable{
 
+
     enum eSemesterType  {A, B, C}
 
     private static final long serialVersionUID = 1L;
@@ -17,14 +21,20 @@ public class Semester implements Serializable{
     private MyDate startDate;
     private MyDate endDate;
     private int numOfCourses;
-    private ArrayList<Course> courses = new ArrayList<>();
-    private eSemesterType semesterTypeArr;
+    private ArrayList<Course> courses;
+    private eSemesterType semesterType;
+    private String name;
 
-    public Semester(int year, MyDate startDate, MyDate endDate, eSemesterType semesterTypeArr) {
+    public Semester() {
+    }
+
+    public Semester(int year, MyDate startDate, MyDate endDate, eSemesterType semesterType) {
         this.year = year;
         this.startDate = startDate;
         this.endDate = endDate;
-        this.semesterTypeArr = semesterTypeArr;
+        this.semesterType = semesterType;
+        name = year +" - " + semesterType.name();
+        courses = new ArrayList<>();
     }
 
     public void addCourse(Course course) {
@@ -44,6 +54,10 @@ public class Semester implements Serializable{
                 return course;
         }
         return null;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public ArrayList<Course> getCourses() {
@@ -70,7 +84,13 @@ public class Semester implements Serializable{
         return courses.get(index);
     }
 
-    public eSemesterType getSemesterTypeArr() {
-        return semesterTypeArr;
+    public eSemesterType getSemesterType() {
+        return semesterType;
     }
+
+    @Override
+    public boolean equals(Object semester) {
+        return name.equals(((Semester)semester).getName());
+    }
+
 }

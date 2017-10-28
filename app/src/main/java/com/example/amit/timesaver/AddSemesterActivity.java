@@ -14,6 +14,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.codetroopers.betterpickers.calendardatepicker.CalendarDatePickerDialogFragment;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
 
@@ -21,13 +25,21 @@ public class AddSemesterActivity extends BaseActivity implements CalendarDatePic
 
     private static final String FRAG_DATE_PICKER_START = "frag_date_picker_start";
     private static final String FRAG_DATE_PICKER_END = "frag_date_picker_end";
+    private static final int INTERVAL_YEAR = 10;
 
-    private ArrayList<Semester> semesters = new ArrayList<>();
+    private ArrayList<Semester> semesterstoAdd;
 
     private int yearSelected;
     private MyDate startDateSelected;
     private MyDate endDateSelected;
     private Semester.eSemesterType semesterTypeSelected;
+
+    private String userID;
+
+    private FirebaseDatabase mFirebaseDatabase;
+    private FirebaseAuth mAuth;
+    private DatabaseReference databaseReference;
+
 
 
     @Override
@@ -39,15 +51,25 @@ public class AddSemesterActivity extends BaseActivity implements CalendarDatePic
         DrawerLayout.LayoutParams dlp  = (DrawerLayout.LayoutParams)findViewById(R.id.activity_add_semester).getLayoutParams();
         dlp.setMargins(50,50,50,50);
 
+        mAuth = FirebaseAuth.getInstance();
+        mFirebaseDatabase = FirebaseDatabase.getInstance();
+        databaseReference = mFirebaseDatabase.getReference();
+
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        userID = currentUser.getUid();
+
+        semesterstoAdd = new ArrayList<>();
+
         ArrayList<String> years = new ArrayList<>();
         int thisYear = Calendar.getInstance().get(Calendar.YEAR);
-        for (int i = 1970; i <= thisYear + 10; i++) {
+        for (int i = thisYear - INTERVAL_YEAR; i <= thisYear + INTERVAL_YEAR; i++) {
             years.add(Integer.toString(i));
         }
 
         setListeners(years);
 
     }
+
 
     private void setListeners(ArrayList<String> years) {
         final ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, years);
@@ -83,8 +105,8 @@ public class AddSemesterActivity extends BaseActivity implements CalendarDatePic
             }
         });
 
-        TextView spinSemesterStartDate = (TextView) findViewById(R.id.start_date_text_view);
-        spinSemesterStartDate.setOnClickListener(new View.OnClickListener() {
+        TextView semesterStartDate = (TextView) findViewById(R.id.start_date_text_view);
+        semesterStartDate.setOnClickListener(new View.OnClickListener() {
             //thanks android-better-pickers
             @Override
             public void onClick(View v) {
@@ -97,8 +119,8 @@ public class AddSemesterActivity extends BaseActivity implements CalendarDatePic
             }
         });
 
-        TextView spinSemesterEndDate = (TextView) findViewById(R.id.end_date_text_view);
-        spinSemesterEndDate.setOnClickListener(new View.OnClickListener() {
+        TextView semesterEndDate = (TextView) findViewById(R.id.end_date_text_view);
+        semesterEndDate.setOnClickListener(new View.OnClickListener() {
             //thanks android-better-pickers
             @Override
             public void onClick(View v) {
@@ -115,9 +137,10 @@ public class AddSemesterActivity extends BaseActivity implements CalendarDatePic
         confirmButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(checkInputBeforeNextActivity()) {
+                if(checkInputAndAdd()) {
+
                     Intent intentEnterCourses = new Intent(getApplicationContext(), AddCourseActivity.class);
-                    intentEnterCourses.putExtra(Keys.SEMESTERS, semesters);
+                    intentEnterCourses.putExtra(Keys.SEMESTERS, semesterstoAdd);
                     startActivity(intentEnterCourses);
                 }
             }
@@ -127,17 +150,18 @@ public class AddSemesterActivity extends BaseActivity implements CalendarDatePic
         addSemesterButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(checkInputBeforeNextActivity())
+                if(checkInputAndAdd())
                     Toast.makeText(getApplicationContext(), "Semester successfully added!", Toast.LENGTH_LONG).show();
             }
         });
     }
 
 
-    private boolean checkInputBeforeNextActivity() {
+    private boolean checkInputAndAdd() {
         if(startDateSelected != null && endDateSelected != null) {
             Semester semester = new Semester(yearSelected, startDateSelected, endDateSelected, semesterTypeSelected);
-            semesters.add(semester);
+            semesterstoAdd.add(semester);
+            databaseReference.child("users").child(userID).child("semesters").push().setValue(semester);
             return true;
         } else {
             Toast.makeText(getApplicationContext(), "Please choose start and end dates for the semester", Toast.LENGTH_LONG)

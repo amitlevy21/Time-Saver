@@ -96,11 +96,15 @@ public class LoginActivity extends AppCompatActivity {
                 final FirebaseUser user = firebaseAuth.getCurrentUser();
                 if (user != null) {
                     //user signed in
+                    Intent intent;
                     if(!firstLogin) {
-                        Intent addSemesterIntent = new Intent(getApplicationContext(), DashboardActivity.class);
-                        startActivity(addSemesterIntent);
-                        finish();
+                        intent = new Intent(getApplicationContext(), DashboardActivity.class);
+
+                    } else {
+                        intent = new Intent(getApplicationContext(), AddSemesterActivity.class);
                     }
+                    startActivity(intent);
+                    finish();
 
                 } else {
                     // user is signed out
@@ -140,8 +144,6 @@ public class LoginActivity extends AppCompatActivity {
         String email = _emailText.getText().toString();
         String password = _passwordText.getText().toString();
 
-        // TODO: Implement your own authentication logic here.
-
         mAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
@@ -149,7 +151,6 @@ public class LoginActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "signInWithEmail:success");
-                            final FirebaseUser user = mAuth.getCurrentUser();
                             progressDialog.dismiss();
                             onLoginSuccess();
 
@@ -171,13 +172,13 @@ public class LoginActivity extends AppCompatActivity {
         if (requestCode == REQUEST_SIGNUP) {
             if (resultCode == RESULT_OK) {
 
-                // TODO: Implement successful signup logic here
                 Toast.makeText(this, "Successful sign-up! you can now log in", Toast.LENGTH_LONG).show();
                 FirebaseUser user = mAuth.getCurrentUser();
                 userID = user.getUid();
 
                 Bundle bundle = data.getExtras();
                 MyUserInfo myUserInfo = (MyUserInfo) bundle.getSerializable(Keys.USER_INFO);
+
                 databaseReference.child("users").child(userID).setValue(myUserInfo);
                 firstLogin = true;
             }

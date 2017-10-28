@@ -11,17 +11,34 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.GenericTypeIndicator;
+import com.google.firebase.database.ValueEventListener;
+
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class AddCourseActivity extends BaseActivity {
 
-    private ArrayList<Semester> semesters = new ArrayList<>();
-    private ArrayList<Course> courses = new ArrayList<>();
+    private ArrayList<Semester> semesters;
+    private ArrayList<Course> courses;
     private Course course;
-    private Semester semester;
     private String semesterSelected;
     private ArrayList<String> semestersSpinner;
+
+    private String userID;
+
+    private FirebaseDatabase mFirebaseDatabase;
+    private FirebaseAuth mAuth;
+    private DatabaseReference databaseReference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,9 +46,18 @@ public class AddCourseActivity extends BaseActivity {
         setContentView(R.layout.activity_add_course);
 
         buildDrawer();
-        DrawerLayout.LayoutParams dlp  = (DrawerLayout.LayoutParams)findViewById(R.id.activity_add_course).getLayoutParams();
-        dlp.setMargins(50,50,50,50);
+        DrawerLayout.LayoutParams dlp = (DrawerLayout.LayoutParams) findViewById(R.id.activity_add_course).getLayoutParams();
+        dlp.setMargins(50, 50, 50, 50);
 
+        mAuth = FirebaseAuth.getInstance();
+        mFirebaseDatabase = FirebaseDatabase.getInstance();
+        databaseReference = mFirebaseDatabase.getReference();
+
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        userID = currentUser.getUid();
+
+        semesters = new ArrayList<>();
+        courses = new ArrayList<>();
         semestersSpinner = new ArrayList<>();
 
         setListeners();
@@ -49,14 +75,28 @@ public class AddCourseActivity extends BaseActivity {
     protected void onResume() {
         super.onResume();
 
-        if(getIntent().getSerializableExtra(Keys.SEMESTERS) != null)
+        if (getIntent().getSerializableExtra(Keys.SEMESTERS) != null)
             semesters = (ArrayList<Semester>) getIntent().getSerializableExtra(Keys.SEMESTERS);
+        DatabaseReference semestersReference = databaseReference.child("users").child(userID).child("semesters").getRef();
+        semestersReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Toast.makeText(getApplicationContext(), "read add course", Toast.LENGTH_SHORT).show();
+                GenericTypeIndicator<HashMap<String,Semester>> t = new GenericTypeIndicator<HashMap<String,Semester>>() {};
 
-        for (int i = 0; i < semesters.size(); i++) {
-            String semesterNameFormat = semesters.get(i).getYear() + " - " + semesters.get(i).getSemesterTypeArr();
-            semestersSpinner.add(semesterNameFormat);
-        }
+                HashMap<String,Semester> semesterFromFireBase = dataSnapshot.getValue(t);
 
+                for(Map.Entry<String, Semester> entry : semesterFromFireBase.entrySet()) {
+                    semestersSpinner.add(entry.getValue().getName());
+                }
+                Collections.sort(semestersSpinner, new SemesterNameComparator());
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
 
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, semestersSpinner);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -117,7 +157,7 @@ public class AddCourseActivity extends BaseActivity {
 
 
     private boolean checkInput(String courseName) {
-        if(!(courseName.compareTo("") == 0) &&
+        if (!(courseName.compareTo("") == 0) &&
                 !(semesterSelected.compareTo("") == 0))
             return true;
         Toast.makeText(getApplicationContext(), "you should enter a course name!", Toast.LENGTH_LONG).show();
@@ -125,16 +165,25 @@ public class AddCourseActivity extends BaseActivity {
     }
 
     private void putInArray(String courseName, String semesterSelected) {
+        Semester theSemester = findSemesterByName(semesterSelected);
+        course = new Course(courseName, theSemester);
+        theSemester.addCourse(course);
+
+        courses.add(course);
+        databaseReference.child("users").child(userID).child("semesters").push().
+                child("courses").push().setValue(course);
+    }
+
+    public Semester findSemesterByName(String nameSemester) {
         int semesterYear = Integer.parseInt(semesterSelected.substring(0, 4));
-        char semesterType = semesterSelected.charAt(7);
+        Semester.eSemesterType semesterType = Semester.eSemesterType.valueOf(String.valueOf(semesterSelected.charAt(7)));
         for (int i = 0; i < semesters.size(); i++) {
             if ((semesters.get(i).getYear() == semesterYear) &&
-                    (semesters.get(i).getSemesterTypeArr().toString().compareTo(Character.toString(semesterType)) == 0)) {
-                course = new Course(courseName, semesters.get(i));
-                break;
+                    (semesters.get(i).getSemesterType().equals(semesterType))) {
+                return semesters.get(i);
             }
         }
-            courses.add(course);
+        return null;
     }
 }
 

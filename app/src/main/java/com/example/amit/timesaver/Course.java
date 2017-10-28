@@ -16,6 +16,9 @@ class Course implements Serializable{
     private ArrayList<CourseInstance> courseInstances = new ArrayList<>();
     private int numOfInstances;
 
+    public Course() {
+    }
+
     public Course(String name, Semester semesterTaken) {
         this.name = name;
         this.semesterTaken = semesterTaken;

@@ -35,14 +35,13 @@ public class AddCourseInstanceActivity extends BaseActivity implements RadialTim
     private int chosenStartHour;
     private int chosenEndHour;
     private String chosenProfessorName;
-    private ArrayList<CourseInstance> courseInstances = new ArrayList<>();
-    private ArrayList<Course> courses = new ArrayList<>();
+    private ArrayList<CourseInstance> courseInstances;
+    private ArrayList<Course> courses;
 
 
     private static final String FRAG_TAG_TIME_PICKER_START = "timePickerDialogFragmentStart";
     private static final String FRAG_TAG_TIME_PICKER_END = "timePickerDialogFragmentEnd";
     private static final String FRAG_DATE_PICKER = "datePickerDialogFragment";
-    private ArrayList<String> coursesNames;
 
 
     private enum eDay {
@@ -58,6 +57,9 @@ public class AddCourseInstanceActivity extends BaseActivity implements RadialTim
         buildDrawer();
         DrawerLayout.LayoutParams dlp  = (DrawerLayout.LayoutParams)findViewById(R.id.activity_add_instance).getLayoutParams();
         dlp.setMargins(50,50,50,50);
+
+        courseInstances = new ArrayList<>();
+        courses = new ArrayList<>();
 
         addListeners();
 
@@ -78,7 +80,7 @@ public class AddCourseInstanceActivity extends BaseActivity implements RadialTim
         if(getIntent().getSerializableExtra(Keys.COURSES) != null)
             courses = (ArrayList<Course>) getIntent().getSerializableExtra(Keys.COURSES);
 
-        coursesNames = new ArrayList<>();
+        ArrayList<String> coursesNames = new ArrayList<>();
         for (int i = 0; i < courses.size(); i++) {
             String temp = courses.get(i).getName();
             coursesNames.add(temp);

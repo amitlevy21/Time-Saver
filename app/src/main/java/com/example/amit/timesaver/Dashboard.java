@@ -1,10 +1,14 @@
 package com.example.amit.timesaver;
 
+import java.io.Serializable;
+
 /**
  * Created by amit on 13/10/17.
  */
 
-public class Dashboard {
+public class Dashboard implements Serializable{
+
+    private static final long serialVersionUID = 1L;
 
     private int numOfTodaysTasksDue;
     private int numOfTodaysClasses;
