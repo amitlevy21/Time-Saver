@@ -71,7 +71,7 @@ public class TaskManagerActivity extends BaseActivity {
     public void testRecyclerView() {
 
     for (int i = 0; i < 20; i++) {
-        Course c = new Course("course" + i, semesterRelated);
+        Course c = new Course("course" + i, semesterRelated.getName());
         Task taskToAdd = new Task(c, new MyDate(1994,2,14), "description " + i);
         taskList.add(taskToAdd);
         semesterRelated.addCourse(c);
