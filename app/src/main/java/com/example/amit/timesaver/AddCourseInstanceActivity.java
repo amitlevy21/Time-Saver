@@ -19,11 +19,22 @@ import android.widget.Toast;
 
 import com.codetroopers.betterpickers.calendardatepicker.CalendarDatePickerDialogFragment;
 import com.codetroopers.betterpickers.radialtimepicker.RadialTimePickerDialogFragment;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.GenericTypeIndicator;
+import com.google.firebase.database.ValueEventListener;
 
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class AddCourseInstanceActivity extends BaseActivity implements RadialTimePickerDialogFragment.OnTimeSetListener,
@@ -43,6 +54,13 @@ public class AddCourseInstanceActivity extends BaseActivity implements RadialTim
     private static final String FRAG_TAG_TIME_PICKER_END = "timePickerDialogFragmentEnd";
     private static final String FRAG_DATE_PICKER = "datePickerDialogFragment";
 
+    private String userID;
+
+    private FirebaseDatabase mFirebaseDatabase;
+    private FirebaseAuth mAuth;
+    private DatabaseReference databaseReference;
+    private ArrayList<String> coursesNames;
+
 
     private enum eDay {
         SUNDAY, MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY
@@ -60,6 +78,14 @@ public class AddCourseInstanceActivity extends BaseActivity implements RadialTim
 
         courseInstances = new ArrayList<>();
         courses = new ArrayList<>();
+        coursesNames = new ArrayList<>();
+
+        mAuth = FirebaseAuth.getInstance();
+        mFirebaseDatabase = FirebaseDatabase.getInstance();
+        databaseReference = mFirebaseDatabase.getReference();
+
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        userID = currentUser.getUid();
 
         addListeners();
 
@@ -80,12 +106,28 @@ public class AddCourseInstanceActivity extends BaseActivity implements RadialTim
         if(getIntent().getSerializableExtra(Keys.COURSES) != null)
             courses = (ArrayList<Course>) getIntent().getSerializableExtra(Keys.COURSES);
 
-        ArrayList<String> coursesNames = new ArrayList<>();
-        for (int i = 0; i < courses.size(); i++) {
-            String temp = courses.get(i).getName();
-            coursesNames.add(temp);
+        DatabaseReference semestersReference = databaseReference.child("users").child(userID).child("courses").getRef();
+        semestersReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {/*
+                Toast.makeText(getApplicationContext(), "instance read", Toast.LENGTH_SHORT).show();
 
-        }
+                GenericTypeIndicator<HashMap<String,Course>> t = new GenericTypeIndicator<HashMap<String,Course>>() {};
+
+                HashMap<String,Course> coursesFromFireBase = dataSnapshot.getValue(t);
+
+                for(Map.Entry<String, Course> entry : coursesFromFireBase.entrySet()) {
+                    coursesNames.add(entry.getValue().getName());
+                }
+                Collections.sort(coursesNames);*/
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
 
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, coursesNames);
         Spinner spinCourses = (Spinner)findViewById(R.id.course_spinner);
@@ -207,7 +249,7 @@ public class AddCourseInstanceActivity extends BaseActivity implements RadialTim
         confirmButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(checkInputBeforeNextActivity()) {
+                if(save()) {
                     Intent intentDashboard = new Intent(getApplicationContext(), DashboardActivity.class);
                     intentDashboard.putExtra(Keys.COURSE_INSTANCES, courseInstances);
                     startActivity(intentDashboard);
@@ -219,14 +261,14 @@ public class AddCourseInstanceActivity extends BaseActivity implements RadialTim
         addInstanceButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(checkInputBeforeNextActivity()) {
+                if(save()) {
                     Toast.makeText(getApplicationContext(), "Instance successfully added!", Toast.LENGTH_LONG).show();
                 }
             }
         });
     }
 
-    private boolean checkInputBeforeNextActivity() {
+    private boolean save() {
         if (chosenCourse != null && chosenDay != null && chosenStartHour != chosenEndHour && chosenStartHour != 0 && chosenEndHour != 0) {
             CourseInstance courseInstance;
             if (chosenProfessorName != null) {
@@ -236,6 +278,8 @@ public class AddCourseInstanceActivity extends BaseActivity implements RadialTim
                 courseInstance = new CourseInstance(chosenCourse, chosenDay.ordinal(), chosenStartHour, chosenEndHour);
             }
             courseInstances.add(courseInstance);
+            databaseReference.child("users").child(userID).child("semesters")
+                    .push().child("courses").push().child("instances").push().setValue(courseInstance);
             return true;
         } else {
             Toast.makeText(getApplicationContext(), "Please fill all the fields before continuing", Toast.LENGTH_LONG)

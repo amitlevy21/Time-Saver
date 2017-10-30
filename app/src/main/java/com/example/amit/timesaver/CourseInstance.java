@@ -17,6 +17,9 @@ class CourseInstance implements Serializable{
     private int endHour;
     private String professorName;
 
+    public CourseInstance() {
+    }
+
     public CourseInstance(Course course, int dayOfWeek, int startHour, int endHour, String professorName) {
         this.course = course;
         this.dayOfWeek = dayOfWeek;
@@ -48,4 +51,6 @@ class CourseInstance implements Serializable{
     public String getProfessorName() {
         return professorName;
     }
+
+
 }

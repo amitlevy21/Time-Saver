@@ -26,6 +26,7 @@ public class Semester implements Serializable{
     private String name;
 
     public Semester() {
+        courses = new ArrayList<>();
     }
 
     public Semester(int year, MyDate startDate, MyDate endDate, eSemesterType semesterType) {
@@ -92,5 +93,6 @@ public class Semester implements Serializable{
     public boolean equals(Object semester) {
         return name.equals(((Semester)semester).getName());
     }
+
 
 }

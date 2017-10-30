@@ -18,6 +18,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.GenericTypeIndicator;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
@@ -39,6 +40,7 @@ public class AddCourseActivity extends BaseActivity {
     private FirebaseDatabase mFirebaseDatabase;
     private FirebaseAuth mAuth;
     private DatabaseReference databaseReference;
+    private ArrayAdapter<String> adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +63,7 @@ public class AddCourseActivity extends BaseActivity {
         semestersSpinner = new ArrayList<>();
 
         setListeners();
+
     }
 
     //added because of activity launchMode is SingleTop
@@ -77,6 +80,8 @@ public class AddCourseActivity extends BaseActivity {
 
         if (getIntent().getSerializableExtra(Keys.SEMESTERS) != null)
             semesters = (ArrayList<Semester>) getIntent().getSerializableExtra(Keys.SEMESTERS);
+
+        //Load the semesters from database
         DatabaseReference semestersReference = databaseReference.child("users").child(userID).child("semesters").getRef();
         semestersReference.addValueEventListener(new ValueEventListener() {
             @Override
@@ -84,12 +89,14 @@ public class AddCourseActivity extends BaseActivity {
                 Toast.makeText(getApplicationContext(), "read add course", Toast.LENGTH_SHORT).show();
                 GenericTypeIndicator<HashMap<String,Semester>> t = new GenericTypeIndicator<HashMap<String,Semester>>() {};
 
-                HashMap<String,Semester> semesterFromFireBase = dataSnapshot.getValue(t);
+                HashMap<String,Semester> semestersFromFireBase = dataSnapshot.getValue(t);
 
-                for(Map.Entry<String, Semester> entry : semesterFromFireBase.entrySet()) {
+                for(Map.Entry<String, Semester> entry : semestersFromFireBase.entrySet()) {
                     semestersSpinner.add(entry.getValue().getName());
+                    semesters.add(entry.getValue());
                 }
                 Collections.sort(semestersSpinner, new SemesterNameComparator());
+                adapter.notifyDataSetChanged();
             }
 
             @Override
@@ -98,16 +105,10 @@ public class AddCourseActivity extends BaseActivity {
             }
         });
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, semestersSpinner);
+        adapter = new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_spinner_item, semestersSpinner);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         Spinner spinSemester = (Spinner) findViewById(R.id.semester_spinner);
         spinSemester.setAdapter(adapter);
-
-    }
-
-    private void setListeners() {
-
-        Spinner spinSemester = (Spinner) findViewById(R.id.semester_spinner);
         spinSemester.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
@@ -121,7 +122,9 @@ public class AddCourseActivity extends BaseActivity {
                 semesterSelected = adapterView.getSelectedItem().toString();
             }
         });
+    }
 
+    private void setListeners() {
 
         Button confirmCourseButton = (Button) findViewById(R.id.button_confirm_add_course);
         confirmCourseButton.setOnClickListener(new View.OnClickListener() {
@@ -131,7 +134,7 @@ public class AddCourseActivity extends BaseActivity {
                 EditText txtDescription = (EditText) findViewById(R.id.course_name_input);
                 String courseName = txtDescription.getText().toString();
                 if (checkInput(courseName)) {
-                    putInArray(courseName, semesterSelected);
+                    save(courseName);
 
                     Intent intentEnterCourses = new Intent(getApplicationContext(), AddCourseInstanceActivity.class);
                     intentEnterCourses.putExtra(Keys.COURSES, courses);
@@ -148,7 +151,7 @@ public class AddCourseActivity extends BaseActivity {
                 EditText txtDescription = (EditText) findViewById(R.id.course_name_input);
                 String courseName = txtDescription.getText().toString();
                 if (checkInput(courseName)) {
-                    putInArray(courseName, semesterSelected);
+                    save(courseName);
                     Toast.makeText(getApplicationContext(), "Course successfully added!", Toast.LENGTH_LONG).show();
                 }
             }
@@ -164,17 +167,34 @@ public class AddCourseActivity extends BaseActivity {
         return false;
     }
 
-    private void putInArray(String courseName, String semesterSelected) {
-        Semester theSemester = findSemesterByName(semesterSelected);
-        course = new Course(courseName, theSemester);
+    private void save(String courseName) {
+        Semester theSemester = findSemesterByName();
+        course = new Course(courseName, theSemester.getName());
         theSemester.addCourse(course);
 
         courses.add(course);
-        databaseReference.child("users").child(userID).child("semesters").push().
-                child("courses").push().setValue(course);
+        Query query =databaseReference.child("users").child(userID)
+                .child("semesters").orderByChild("name").equalTo(semesterSelected);
+        final String key = query.getRef().getKey();
+        query.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists()) {
+                    for(DataSnapshot semester : dataSnapshot.getChildren()) {
+                        DatabaseReference semesterData = semester.getRef();
+                        semesterData.child(key).setValue(course);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 
-    public Semester findSemesterByName(String nameSemester) {
+    public Semester findSemesterByName() {
         int semesterYear = Integer.parseInt(semesterSelected.substring(0, 4));
         Semester.eSemesterType semesterType = Semester.eSemesterType.valueOf(String.valueOf(semesterSelected.charAt(7)));
         for (int i = 0; i < semesters.size(); i++) {

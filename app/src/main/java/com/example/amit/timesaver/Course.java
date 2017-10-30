@@ -12,14 +12,15 @@ class Course implements Serializable{
     private static final long serialVersionUID = 1L;
 
     private String name;
-    private Semester semesterTaken;
-    private ArrayList<CourseInstance> courseInstances = new ArrayList<>();
+    private String semesterTaken;
+    private ArrayList<CourseInstance> courseInstances;
     private int numOfInstances;
 
     public Course() {
+        courseInstances = new ArrayList<>();
     }
 
-    public Course(String name, Semester semesterTaken) {
+    public Course(String name, String semesterTaken) {
         this.name = name;
         this.semesterTaken = semesterTaken;
     }
@@ -28,7 +29,7 @@ class Course implements Serializable{
         return name;
     }
 
-    public Semester getSemesterTaken() {
+    public String getSemesterTaken() {
         return semesterTaken;
     }
 
@@ -50,4 +51,10 @@ class Course implements Serializable{
         if(numOfInstances != 0)
             numOfInstances--;
     }
+
+    public ArrayList<CourseInstance> getCourseInstances() {
+        return courseInstances;
+    }
+
+
 }
