@@ -1,6 +1,9 @@
 package com.example.amit.timesaver;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Intent;
+import android.icu.util.Calendar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -20,6 +23,8 @@ public class BaseActivity extends AppCompatActivity {
     protected static final int ADD_COURSE_DRAWER_POSITION = 3;
     protected static final int ADD_INSTANCE_DRAWER_POSITION = 4;
 
+    public static final String MY_ACTION = "com.sample.myaction";
+
     DrawerBuilder drawerBuilder;
     Drawer drawer;
 
@@ -28,6 +33,17 @@ public class BaseActivity extends AppCompatActivity {
         setTheme(R.style.AppTheme);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_base);
+
+
+        //////////alarm
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY, 11);
+        calendar.set(Calendar.MINUTE, 43);
+        calendar.set(Calendar.SECOND, 0);
+        Intent intent1 = new Intent(BaseActivity.this, AlarmReceiver.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(BaseActivity.this, 0,intent1, PendingIntent.FLAG_UPDATE_CURRENT);
+        AlarmManager am = (AlarmManager) BaseActivity.this.getSystemService(BaseActivity.this.ALARM_SERVICE);
+        am.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent);
 
 
         drawerBuilder = new DrawerBuilder().withActivity(this)
