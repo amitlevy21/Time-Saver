@@ -15,10 +15,9 @@ import java.util.ArrayList;
 public class AlarmReceiver extends BroadcastReceiver {
 
     private int MID = 0;
-    private ArrayList<Task> tasks;
+    private ArrayList<Task> tasks = TaskManager.getInstance().getPendingTasks();
     boolean notify = false;
     private MyDate day;
-    int tomorrow;
     public static final String MY_ACTION = "com.sample.myaction";
 
     @Override
@@ -38,17 +37,27 @@ public class AlarmReceiver extends BroadcastReceiver {
 
         Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
-        NotificationCompat.Builder mNotifyBuilder = new NotificationCompat.Builder(
-                context).setSmallIcon(R.drawable.splash_icon)
-                .setContentTitle("Don't forget to finish you tasks for tomorrow")
-                .setContentText("Events to be Performed").setSound(alarmSound)
-                .setAutoCancel(true).setWhen(when)
-                .setContentIntent(pendingIntent)
-                .setVibrate(new long[]{1000, 1000, 1000, 1000, 1000});
+        day = new MyDate(Calendar.YEAR, Calendar.MONTH, Calendar.DAY_OF_MONTH+1);
+
+        for(int i = 0; i < tasks.size(); i++){
+            if((tasks.get(i).getDueDate().compareTo(day))== 0)
+                notify = true;
+        }
+
+
+        if(notify) {
+            NotificationCompat.Builder mNotifyBuilder = new NotificationCompat.Builder(
+                    context).setSmallIcon(R.drawable.splash_icon)
+                    .setContentTitle("Don't forget to finish you tasks for tomorrow")
+                    .setContentText("Events to be Performed").setSound(alarmSound)
+                    .setAutoCancel(true).setWhen(when)
+                    .setContentIntent(pendingIntent)
+                    .setVibrate(new long[]{1000, 1000, 1000, 1000, 1000});
 
             notificationManager.notify(MID, mNotifyBuilder.build());
             MID++;
-
+            notify = false;
+            }
         }
     }
 
