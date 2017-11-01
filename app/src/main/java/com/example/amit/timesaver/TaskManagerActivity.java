@@ -11,6 +11,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
 
+
 import java.util.List;
 
 public class TaskManagerActivity extends BaseActivity {
@@ -50,12 +51,26 @@ public class TaskManagerActivity extends BaseActivity {
         semesterRelated = new Semester(1994, new MyDate(1994,12,28), new MyDate(1995,12,28), Semester.eSemesterType.A);
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.task_manager_fab);
 
+        //add task
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent addTask = new Intent(getApplicationContext(), AddTaskActivity.class);
                 addTask.putExtra(Keys.SEMESTER, semesterRelated);
                 startActivityForResult(addTask, REQUEST_ADD_TASK);
+            }
+        });
+        //remove task
+        fab.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                for (int i = 0; i < taskManager.getNumOfPendingTasks(); i++) {
+                    if(taskManager.getPendingTaskAtIndex(i).isDone()) {
+                        tasksAdapter.removeItem(i);
+                    }
+                }
+
+                return true;
             }
         });
 
@@ -75,6 +90,7 @@ public class TaskManagerActivity extends BaseActivity {
         Task taskToAdd = new Task(c, new MyDate(1994,2,14), "description " + i);
         taskList.add(taskToAdd);
         semesterRelated.addCourse(c);
+        taskManager.addTask(taskToAdd);
     }
     tasksAdapter.notifyDataSetChanged();
 

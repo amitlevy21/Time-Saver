@@ -8,6 +8,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.codetroopers.betterpickers.calendardatepicker.CalendarDatePickerDialogFragment;
@@ -88,6 +89,9 @@ public class AddTaskActivity extends BaseActivity implements CalendarDatePickerD
             public void onClick(View view) {
                 EditText description = (EditText) findViewById(R.id.task_description);
                 Course courseRelated = semesterRelated.getCourseByName(courseNameSelected);
+                TextView dueDateTextView = (TextView) findViewById(R.id.task_manager_date_due);
+
+
                 Task taskToAdd = new Task(courseRelated, dueDate, description.getText().toString());
                 Intent intent = new Intent(getApplicationContext(), TaskManagerActivity.class);
                 intent.putExtra(Keys.TASK_ADDED, taskToAdd);
@@ -100,5 +104,5 @@ public class AddTaskActivity extends BaseActivity implements CalendarDatePickerD
     @Override
     public void onDateSet(CalendarDatePickerDialogFragment dialog, int year, int monthOfYear, int dayOfMonth) {
         dueDate = new MyDate(year, monthOfYear, dayOfMonth);
-    }
+        }
 }

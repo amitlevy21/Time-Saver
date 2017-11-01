@@ -180,10 +180,8 @@ public class AddCourseActivity extends BaseActivity {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if(dataSnapshot.exists()) {
-                    for(DataSnapshot semester : dataSnapshot.getChildren()) {
-                        DatabaseReference semesterData = semester.getRef();
+                        DatabaseReference semesterData = dataSnapshot.getRef();
                         semesterData.child(key).setValue(course);
-                    }
                 }
             }
 

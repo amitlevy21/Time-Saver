@@ -63,4 +63,9 @@ class MyDate implements Comparable<MyDate> , Serializable{
             }
         }
     }
+
+    @Override
+    public String toString() {
+        return day + "/" + month + "/" + year;
+    }
 }
