@@ -4,6 +4,7 @@ import java.util.Calendar;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.DrawerLayout;
 import android.view.View;
 import android.widget.AdapterView;
@@ -26,8 +27,9 @@ public class AddSemesterActivity extends BaseActivity implements CalendarDatePic
     private static final String FRAG_DATE_PICKER_START = "frag_date_picker_start";
     private static final String FRAG_DATE_PICKER_END = "frag_date_picker_end";
     private static final int INTERVAL_YEAR = 10;
+    private static final int SEMESTER_INDEX_NOT_FOUND = -1;
 
-    private ArrayList<Semester> semesterstoAdd;
+    private ArrayList<Semester> semestersToAdd;
 
     private int yearSelected;
     private MyDate startDateSelected;
@@ -58,7 +60,7 @@ public class AddSemesterActivity extends BaseActivity implements CalendarDatePic
         FirebaseUser currentUser = mAuth.getCurrentUser();
         userID = currentUser.getUid();
 
-        semesterstoAdd = new ArrayList<>();
+        semestersToAdd = new ArrayList<>();
 
         ArrayList<String> years = new ArrayList<>();
         int thisYear = Calendar.getInstance().get(Calendar.YEAR);
@@ -90,7 +92,7 @@ public class AddSemesterActivity extends BaseActivity implements CalendarDatePic
             }
         });
 
-        Spinner spinSemesterType = (Spinner) findViewById(R.id.semester_type_spinner);
+        final Spinner spinSemesterType = (Spinner) findViewById(R.id.semester_type_spinner);
         spinSemesterType.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
@@ -137,31 +139,64 @@ public class AddSemesterActivity extends BaseActivity implements CalendarDatePic
         confirmButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(checkInputAndAdd()) {
+                if(checkInput()) {
+                    Semester semester = new Semester(yearSelected, startDateSelected, endDateSelected, semesterTypeSelected);
+                    semestersToAdd.add(semester);
+                    databaseReference.child("users").child(userID).child("semesters").push().setValue(semester);
+
 
                     Intent intentEnterCourses = new Intent(getApplicationContext(), AddCourseActivity.class);
-                    intentEnterCourses.putExtra(Keys.SEMESTERS, semesterstoAdd);
+                    intentEnterCourses.putExtra(Keys.SEMESTERS, semestersToAdd);
                     startActivity(intentEnterCourses);
                 }
             }
         });
 
-        Button addSemesterButton = (Button) findViewById(R.id.button_add_semester);
-        addSemesterButton.setOnClickListener(new View.OnClickListener() {
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.add_semester_fab);
+
+        //add semester
+        fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(checkInputAndAdd())
+                if(checkInput()) {
+                    Semester semester = new Semester(yearSelected, startDateSelected, endDateSelected, semesterTypeSelected);
+                    semestersToAdd.add(semester);
+                    databaseReference.child("users").child(userID).child("semesters").push().setValue(semester);
+
                     Toast.makeText(getApplicationContext(), "Semester successfully added!", Toast.LENGTH_LONG).show();
+            }
+            }
+        });
+
+        //remove semester
+        fab.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                if(checkInput()) {
+                    // TODO: 11/2/2017 remove from firebase
+                    int indexOfSemester = findSemesterIIndexByInput();
+                    if(indexOfSemester != SEMESTER_INDEX_NOT_FOUND)
+                        semestersToAdd.remove(indexOfSemester);
+                }
+
+                return true;
+            }
+
+            private int findSemesterIIndexByInput() {
+                for (int i = 0; i < semestersToAdd.size(); i++) {
+                    Semester s = new Semester(yearSelected, startDateSelected, endDateSelected, semesterTypeSelected);
+                    if(semestersToAdd.get(i).equals(s))
+                        return i;
+
+                }
+                return SEMESTER_INDEX_NOT_FOUND;
             }
         });
     }
 
 
-    private boolean checkInputAndAdd() {
+    private boolean checkInput() {
         if(startDateSelected != null && endDateSelected != null) {
-            Semester semester = new Semester(yearSelected, startDateSelected, endDateSelected, semesterTypeSelected);
-            semesterstoAdd.add(semester);
-            databaseReference.child("users").child(userID).child("semesters").push().setValue(semester);
             return true;
         } else {
             Toast.makeText(getApplicationContext(), "Please choose start and end dates for the semester", Toast.LENGTH_LONG)
@@ -170,17 +205,18 @@ public class AddSemesterActivity extends BaseActivity implements CalendarDatePic
         }
     }
 
+
     @Override
     public void onDateSet(CalendarDatePickerDialogFragment dialog, int year, int monthOfYear, int dayOfMonth) {
         MyDate myDate = new MyDate(year, monthOfYear, dayOfMonth);
         if(dialog.getTag().equals(FRAG_DATE_PICKER_START)) {
             startDateSelected = myDate;
             TextView spinSemesterStartDate = (TextView) findViewById(R.id.start_date_text_view);
-            spinSemesterStartDate.setText(dayOfMonth + "/" + monthOfYear + "/" + year);
+            spinSemesterStartDate.setText(myDate.toString());
         } else {
             endDateSelected = myDate;
             TextView spinSemesterEndDate = (TextView) findViewById(R.id.end_date_text_view);
-            spinSemesterEndDate.setText(dayOfMonth + "/" + monthOfYear + "/" + year);
+            spinSemesterEndDate.setText(myDate.toString());
         }
     }
 

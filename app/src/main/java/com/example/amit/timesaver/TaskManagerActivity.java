@@ -103,6 +103,7 @@ public class TaskManagerActivity extends BaseActivity {
             Task task = (Task) taskAddedBundle.getSerializable(Keys.TASK_ADDED);
             taskList.add(task);
             tasksAdapter.notifyDataSetChanged();
+            // TODO: 11/2/2017 add to firebase
         }
     }
 }
