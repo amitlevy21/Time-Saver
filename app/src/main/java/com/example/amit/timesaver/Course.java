@@ -56,5 +56,9 @@ class Course implements Serializable{
         return courseInstances;
     }
 
-
+    @Override
+    public boolean equals(Object obj) {
+        Course temp = (Course)obj;
+        return name.equals(temp.getName());
+    }
 }

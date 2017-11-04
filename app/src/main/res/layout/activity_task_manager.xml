@@ -31,9 +31,9 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
-        android:layout_marginEnd="@dimen/small_margin"
         android:layout_marginBottom="@dimen/small_margin"
-        android:src="@drawable/ic_plus_sign"/>
+        android:layout_marginEnd="@dimen/small_margin"
+        android:src="@drawable/ic_plus_sign" />
 
 
 </RelativeLayout>

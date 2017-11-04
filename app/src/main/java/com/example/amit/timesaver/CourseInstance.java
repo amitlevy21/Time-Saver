@@ -12,15 +12,19 @@ class CourseInstance implements Serializable{
 
 
     private Course course;
-    private int dayOfWeek;
+    private eDay dayOfWeek;
     private int startHour;
     private int endHour;
     private String professorName;
 
+    enum eDay {
+        SUNDAY, MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY
+    }
+
     public CourseInstance() {
     }
 
-    public CourseInstance(Course course, int dayOfWeek, int startHour, int endHour, String professorName) {
+    public CourseInstance(Course course, eDay dayOfWeek, int startHour, int endHour, String professorName) {
         this.course = course;
         this.dayOfWeek = dayOfWeek;
         this.startHour = startHour;
@@ -28,7 +32,7 @@ class CourseInstance implements Serializable{
         this.professorName = professorName;
     }
 
-    public CourseInstance(Course course, int dayOfWeek, int startHour, int endHour) {
+    public CourseInstance(Course course, eDay dayOfWeek, int startHour, int endHour) {
         this(course,dayOfWeek,startHour,endHour, null);
     }
 
@@ -36,7 +40,7 @@ class CourseInstance implements Serializable{
         return course;
     }
 
-    public int getDayOfWeek() {
+    public eDay getDayOfWeek() {
         return dayOfWeek;
     }
 
@@ -52,5 +56,9 @@ class CourseInstance implements Serializable{
         return professorName;
     }
 
-
+    @Override
+    public boolean equals(Object obj) {
+        CourseInstance temp = (CourseInstance)obj;
+        return course.equals(temp.getCourse()) && startHour == temp.getStartHour();
+    }
 }

@@ -11,7 +11,6 @@ public class TaskManager {
 
     private static TaskManager taskManagerInstance = new TaskManager();
     private ArrayList<Task> pendingTasks = new ArrayList<>();
-    private int numOfPendingTasks;
 
     private TaskManager() {}
 
@@ -28,7 +27,7 @@ public class TaskManager {
     }
 
     public int getNumOfPendingTasks() {
-        return numOfPendingTasks;
+        return pendingTasks.size();
     }
 
     public void markTaskAsDone(Task task) {

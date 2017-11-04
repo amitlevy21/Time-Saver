@@ -3,6 +3,7 @@ package com.example.amit.timesaver;
 import android.content.Intent;
 
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.DrawerLayout;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -38,11 +39,12 @@ import java.util.Map;
 
 
 public class AddCourseInstanceActivity extends BaseActivity implements RadialTimePickerDialogFragment.OnTimeSetListener,
-        CalendarDatePickerDialogFragment.OnDateSetListener{
+        CalendarDatePickerDialogFragment.OnDateSetListener {
 
 
+    private static final int INDEX_OF_INSTANCE_NOT_FOUND = -1;
     private Course chosenCourse;
-    private eDay chosenDay;
+    private CourseInstance.eDay chosenDay;
     private int chosenStartHour;
     private int chosenEndHour;
     private String chosenProfessorName;
@@ -62,9 +64,6 @@ public class AddCourseInstanceActivity extends BaseActivity implements RadialTim
     private ArrayList<String> coursesNames;
 
 
-    private enum eDay {
-        SUNDAY, MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY
-    }
 
 
     @Override
@@ -73,8 +72,8 @@ public class AddCourseInstanceActivity extends BaseActivity implements RadialTim
         setContentView(R.layout.activity_add_instance);
 
         buildDrawer();
-        DrawerLayout.LayoutParams dlp  = (DrawerLayout.LayoutParams)findViewById(R.id.activity_add_instance).getLayoutParams();
-        dlp.setMargins(50,50,50,50);
+        DrawerLayout.LayoutParams dlp = (DrawerLayout.LayoutParams) findViewById(R.id.activity_add_instance).getLayoutParams();
+        dlp.setMargins(50, 50, 50, 50);
 
         courseInstances = new ArrayList<>();
         courses = new ArrayList<>();
@@ -103,7 +102,7 @@ public class AddCourseInstanceActivity extends BaseActivity implements RadialTim
     protected void onResume() {
         super.onResume();
 
-        if(getIntent().getSerializableExtra(Keys.COURSES) != null)
+        if (getIntent().getSerializableExtra(Keys.COURSES) != null)
             courses = (ArrayList<Course>) getIntent().getSerializableExtra(Keys.COURSES);
 
         DatabaseReference semestersReference = databaseReference.child("users").child(userID).child("courses").getRef();
@@ -130,25 +129,43 @@ public class AddCourseInstanceActivity extends BaseActivity implements RadialTim
         });
 
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, coursesNames);
-        Spinner spinCourses = (Spinner)findViewById(R.id.course_spinner);
+        Spinner spinCourses = (Spinner) findViewById(R.id.course_spinner);
         spinCourses.setAdapter(adapter);
     }
 
     @Override
-    public void onTimeSet(RadialTimePickerDialogFragment dialog, int hourOfDay, int minute)  {
+    public void onTimeSet(RadialTimePickerDialogFragment dialog, int hourOfDay, int minute) {
 
         switch (dialog.getTag()) {
             case FRAG_TAG_TIME_PICKER_START: {
                 chosenStartHour = hourOfDay * 100 + minute;
                 TextView startHourButton = (TextView) findViewById(R.id.start_hour_button);
-                startHourButton.setText(String.valueOf(chosenStartHour));
+                String hourToDisplay;
+                if (chosenStartHour < 1000) {
+                    if(minute < 10)
+                        hourToDisplay = "0" + hourOfDay + ":0" + minute;
+                    else
+                        hourToDisplay = "0" + hourOfDay + ":" + minute;
+                }
+                else
+                    hourToDisplay = String.valueOf(chosenStartHour);
+                startHourButton.setText(String.valueOf(hourToDisplay));
                 break;
             }
             case FRAG_TAG_TIME_PICKER_END: {
-                if(hourOfDay * 100 + minute > chosenStartHour) {
+                if (hourOfDay * 100 + minute > chosenStartHour) {
                     chosenEndHour = hourOfDay * 100 + minute;
                     TextView endHourButton = (TextView) findViewById(R.id.end_hour_button);
-                    endHourButton.setText(String.valueOf(chosenEndHour));
+                    String hourToDisplay;
+                    if (chosenEndHour < 1000) {
+                        if(minute < 10)
+                            hourToDisplay = "0" + hourOfDay + ":0" + minute;
+                        else
+                            hourToDisplay = "0" + hourOfDay + ":" + minute;
+                    }
+                    else
+                        hourToDisplay = String.valueOf(chosenEndHour);
+                    endHourButton.setText(String.valueOf(hourToDisplay));
                 } else {
                     Toast.makeText(getApplicationContext(), "Please choose valid hours", Toast.LENGTH_LONG).show();
                 }
@@ -166,7 +183,7 @@ public class AddCourseInstanceActivity extends BaseActivity implements RadialTim
 
         int dayOfWeek = myCalendar.get(Calendar.DAY_OF_WEEK);
 
-        chosenDay = eDay.values()[dayOfWeek - 1];
+        chosenDay = CourseInstance.eDay.values()[dayOfWeek - 1];
         TextView dayTaken = (TextView) findViewById(R.id.day_taken_button);
         dayTaken.setText(chosenDay.name());
 
@@ -175,7 +192,7 @@ public class AddCourseInstanceActivity extends BaseActivity implements RadialTim
 
     private void addListeners() {
 
-        Spinner spinCourses = (Spinner)findViewById(R.id.course_spinner);
+        Spinner spinCourses = (Spinner) findViewById(R.id.course_spinner);
 
         spinCourses.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -249,7 +266,7 @@ public class AddCourseInstanceActivity extends BaseActivity implements RadialTim
         confirmButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(save()) {
+                if (save()) {
                     Intent intentDashboard = new Intent(getApplicationContext(), DashboardActivity.class);
                     intentDashboard.putExtra(Keys.COURSE_INSTANCES, courseInstances);
                     startActivity(intentDashboard);
@@ -257,34 +274,73 @@ public class AddCourseInstanceActivity extends BaseActivity implements RadialTim
             }
         });
 
-        Button addInstanceButton = (Button) findViewById(R.id.button_add_instance);
-        addInstanceButton.setOnClickListener(new View.OnClickListener() {
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.add_instance_fab);
+
+
+        //add course
+        fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(save()) {
-                    Toast.makeText(getApplicationContext(), "Instance successfully added!", Toast.LENGTH_LONG).show();
-                }
+                if (checkInput())
+                    save();
+            }
+        });
+
+        //remove course
+        fab.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                if (checkInput())
+                    delete();
+                return true;
             }
         });
     }
 
+
+    private void delete() {
+        int index = findInstanceByIndex();
+        if(index != INDEX_OF_INSTANCE_NOT_FOUND) {
+            // TODO: 11/2/2017 remove from firebase
+            courseInstances.remove(index);
+        }
+    }
+
+
+
+    // TODO: 11/2/2017 fix firebase
     private boolean save() {
+        CourseInstance courseInstance;
+        if (chosenProfessorName != null) {
+            courseInstance = new CourseInstance
+                    (chosenCourse, chosenDay, chosenStartHour, chosenEndHour, chosenProfessorName);
+        } else {
+            courseInstance = new CourseInstance(chosenCourse, chosenDay, chosenStartHour, chosenEndHour);
+        }
+        courseInstances.add(courseInstance);
+       // databaseReference.child("users").child(userID).child("semesters")
+       //         .push().child("courses").push().child("instances").push().setValue(courseInstance);
+        return true;
+    }
+
+
+    private boolean checkInput() {
         if (chosenCourse != null && chosenDay != null && chosenStartHour != chosenEndHour && chosenStartHour != 0 && chosenEndHour != 0) {
-            CourseInstance courseInstance;
-            if (chosenProfessorName != null) {
-                courseInstance = new CourseInstance
-                        (chosenCourse, chosenDay.ordinal(), chosenStartHour, chosenEndHour, chosenProfessorName);
-            } else {
-                courseInstance = new CourseInstance(chosenCourse, chosenDay.ordinal(), chosenStartHour, chosenEndHour);
-            }
-            courseInstances.add(courseInstance);
-            databaseReference.child("users").child(userID).child("semesters")
-                    .push().child("courses").push().child("instances").push().setValue(courseInstance);
             return true;
         } else {
             Toast.makeText(getApplicationContext(), "Please fill all the fields before continuing", Toast.LENGTH_LONG)
                     .show();
             return false;
         }
+    }
+
+    private int findInstanceByIndex() {
+        CourseInstance instanceToFind = new CourseInstance(chosenCourse, chosenDay, chosenStartHour, chosenEndHour, chosenProfessorName);
+        for (int i = 0; i < courseInstances.size(); i++) {
+            if (courseInstances.get(i).equals(instanceToFind)) {
+                return i;
+            }
+        }
+        return INDEX_OF_INSTANCE_NOT_FOUND;
     }
 }

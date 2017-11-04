@@ -8,7 +8,7 @@ import java.io.Serializable;
  * Created by amit on 13/10/17.
  */
 
-public class Task implements Comparable<Task>, Serializable{
+public class Task implements Comparable<Task>, Serializable {
 
     private static final long serialVersionUID = 1L;
 

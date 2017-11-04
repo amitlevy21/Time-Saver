@@ -2,6 +2,7 @@ package com.example.amit.timesaver;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.DrawerLayout;
 import android.view.View;
 import android.widget.AdapterView;
@@ -41,6 +42,7 @@ public class AddCourseActivity extends BaseActivity {
     private FirebaseAuth mAuth;
     private DatabaseReference databaseReference;
     private ArrayAdapter<String> adapter;
+    private int INDEX_OF_COURSE_NOT_FOUND = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -143,47 +145,60 @@ public class AddCourseActivity extends BaseActivity {
             }
         });
 
-        Button addAnotherCourseButton = (Button) findViewById(R.id.button_add_another_course);
-        addAnotherCourseButton.setOnClickListener(new View.OnClickListener() {
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.add_course_fab);
+
+        //add course
+        fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
                 EditText txtDescription = (EditText) findViewById(R.id.course_name_input);
                 String courseName = txtDescription.getText().toString();
                 if (checkInput(courseName)) {
                     save(courseName);
-                    Toast.makeText(getApplicationContext(), "Course successfully added!", Toast.LENGTH_LONG).show();
                 }
+            }
+        });
+
+        //remove course
+        fab.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                EditText txtDescription = (EditText) findViewById(R.id.course_name_input);
+                String courseName = txtDescription.getText().toString();
+                if(checkInput(courseName)) {
+                    delete(courseName);
+                }
+                return true;
             }
         });
     }
 
 
     private boolean checkInput(String courseName) {
-        if (!(courseName.compareTo("") == 0) &&
-                !(semesterSelected.compareTo("") == 0))
+        if (!(courseName.compareTo("") == 0))
             return true;
         Toast.makeText(getApplicationContext(), "you should enter a course name!", Toast.LENGTH_LONG).show();
         return false;
     }
 
+    // TODO: 11/2/2017 to fix
     private void save(String courseName) {
         Semester theSemester = findSemesterByName();
         course = new Course(courseName, theSemester.getName());
         theSemester.addCourse(course);
 
         courses.add(course);
-        Query query =databaseReference.child("users").child(userID)
+        /*Query query = databaseReference.child("users").child(userID)
                 .child("semesters").orderByChild("name").equalTo(semesterSelected);
         final String key = query.getRef().getKey();
         query.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if(dataSnapshot.exists()) {
-                    for(DataSnapshot semester : dataSnapshot.getChildren()) {
-                        DatabaseReference semesterData = semester.getRef();
-                        semesterData.child(key).setValue(course);
-                    }
+                    DatabaseReference semesterData = dataSnapshot.getRef();
+                    semesterData.child(key).setValue(course);
+                    Toast.makeText(getApplicationContext(), "Course successfully added!", Toast.LENGTH_LONG).show();
+
                 }
             }
 
@@ -191,7 +206,23 @@ public class AddCourseActivity extends BaseActivity {
             public void onCancelled(DatabaseError databaseError) {
 
             }
-        });
+        });*/
+    }
+
+    private void delete(String courseName) {
+        int indexOfCourse = findCourseIndexByName(courseName);
+        if (indexOfCourse != INDEX_OF_COURSE_NOT_FOUND) {
+            // TODO: 11/2/2017 remove from firebase
+            courses.remove(indexOfCourse);
+        }
+    }
+
+    private int findCourseIndexByName(String courseName) {
+        for (int i = 0; i < courses.size(); i++) {
+            if (courses.get(i).getName().equals(courseName))
+                return i;
+        }
+        return INDEX_OF_COURSE_NOT_FOUND;
     }
 
     public Semester findSemesterByName() {
@@ -205,5 +236,7 @@ public class AddCourseActivity extends BaseActivity {
         }
         return null;
     }
+
+
 }
 
