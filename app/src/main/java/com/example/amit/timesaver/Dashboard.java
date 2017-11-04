@@ -1,6 +1,8 @@
 package com.example.amit.timesaver;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by amit on 13/10/17.
@@ -19,6 +21,9 @@ public class Dashboard implements Serializable{
     private int numOfTotalTasksDone;
 
     private static Dashboard dashboardInstance = new Dashboard();
+
+    private ArrayList<Semester> semesters = new ArrayList<>();
+
 
     private Dashboard() {}
 
@@ -64,5 +69,21 @@ public class Dashboard implements Serializable{
 
     public void setNumOfTotalTasksDone(int numOfTotalTasksDone) {
         this.numOfTotalTasksDone = numOfTotalTasksDone;
+    }
+
+    public ArrayList<Semester> getSemesters() {
+        return semesters;
+    }
+
+    public ArrayList<Course> getCourses() {
+        ArrayList<Course> toReturn = new ArrayList<>(semesters.size());
+        for (Semester s: semesters) {
+            toReturn.addAll(s.getCourses());
+        }
+        return toReturn;
+    }
+
+    public void setSemesters(ArrayList<Semester> semesters) {
+        this.semesters = semesters;
     }
 }

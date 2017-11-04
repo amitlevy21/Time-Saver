@@ -1,7 +1,6 @@
 package com.example.amit.timesaver;
 
 
-import android.support.annotation.NonNull;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -93,6 +92,7 @@ public class Semester implements Serializable{
     public boolean equals(Object semester) {
         return name.equals(((Semester)semester).getName());
     }
+
 
 
 }

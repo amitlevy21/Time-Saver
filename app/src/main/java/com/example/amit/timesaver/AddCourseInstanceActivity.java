@@ -26,16 +26,12 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
 
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.Map;
 
 
 public class AddCourseInstanceActivity extends BaseActivity implements RadialTimePickerDialogFragment.OnTimeSetListener,
@@ -43,7 +39,8 @@ public class AddCourseInstanceActivity extends BaseActivity implements RadialTim
 
 
     private static final int INDEX_OF_INSTANCE_NOT_FOUND = -1;
-    private Course chosenCourse;
+    private static final int INDEX_OF_COURSE_NOT_FOUND = -1;
+    private String chosenCourse;
     private CourseInstance.eDay chosenDay;
     private int chosenStartHour;
     private int chosenEndHour;
@@ -76,7 +73,6 @@ public class AddCourseInstanceActivity extends BaseActivity implements RadialTim
         dlp.setMargins(50, 50, 50, 50);
 
         courseInstances = new ArrayList<>();
-        courses = new ArrayList<>();
         coursesNames = new ArrayList<>();
 
         mAuth = FirebaseAuth.getInstance();
@@ -101,14 +97,17 @@ public class AddCourseInstanceActivity extends BaseActivity implements RadialTim
     @Override
     protected void onResume() {
         super.onResume();
+        courses = Dashboard.getInstance().getCourses();
 
-        if (getIntent().getSerializableExtra(Keys.COURSES) != null)
-            courses = (ArrayList<Course>) getIntent().getSerializableExtra(Keys.COURSES);
+        /*if (getIntent().getSerializableExtra(Keys.COURSES) != null)
+            courses = (ArrayList<Course>) getIntent().getSerializableExtra(Keys.COURSES);*/
 
         DatabaseReference semestersReference = databaseReference.child("users").child(userID).child("courses").getRef();
         semestersReference.addValueEventListener(new ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {/*
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                // TODO: 04/11/17 Solve
+                /*
                 Toast.makeText(getApplicationContext(), "instance read", Toast.LENGTH_SHORT).show();
 
                 GenericTypeIndicator<HashMap<String,Course>> t = new GenericTypeIndicator<HashMap<String,Course>>() {};
@@ -197,13 +196,13 @@ public class AddCourseInstanceActivity extends BaseActivity implements RadialTim
         spinCourses.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                chosenCourse = courses.get(i);
+                chosenCourse = adapterView.getSelectedItem().toString();
                 adapterView.setSelection(i);
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> adapterView) {
-                chosenCourse = courses.get(0);
+                chosenCourse = adapterView.getSelectedItem().toString();
                 adapterView.setSelection(0);
             }
         });
@@ -299,7 +298,7 @@ public class AddCourseInstanceActivity extends BaseActivity implements RadialTim
 
 
     private void delete() {
-        int index = findInstanceByIndex();
+        int index = findInstanceIndex();
         if(index != INDEX_OF_INSTANCE_NOT_FOUND) {
             // TODO: 11/2/2017 remove from firebase
             courseInstances.remove(index);
@@ -311,13 +310,15 @@ public class AddCourseInstanceActivity extends BaseActivity implements RadialTim
     // TODO: 11/2/2017 fix firebase
     private boolean save() {
         CourseInstance courseInstance;
+        Course course = courses.get(findCourseIndexByName());
         if (chosenProfessorName != null) {
             courseInstance = new CourseInstance
-                    (chosenCourse, chosenDay, chosenStartHour, chosenEndHour, chosenProfessorName);
+                    (course, chosenDay, chosenStartHour, chosenEndHour, chosenProfessorName);
         } else {
-            courseInstance = new CourseInstance(chosenCourse, chosenDay, chosenStartHour, chosenEndHour);
+            courseInstance = new CourseInstance(course, chosenDay, chosenStartHour, chosenEndHour);
         }
         courseInstances.add(courseInstance);
+        course.addInstance(courseInstance);
        // databaseReference.child("users").child(userID).child("semesters")
        //         .push().child("courses").push().child("instances").push().setValue(courseInstance);
         return true;
@@ -334,8 +335,17 @@ public class AddCourseInstanceActivity extends BaseActivity implements RadialTim
         }
     }
 
-    private int findInstanceByIndex() {
-        CourseInstance instanceToFind = new CourseInstance(chosenCourse, chosenDay, chosenStartHour, chosenEndHour, chosenProfessorName);
+    private int findCourseIndexByName() {
+        for (int i = 0; i < courses.size(); i++) {
+            if (courses.get(i).getName().equals(chosenCourse))
+                return i;
+        }
+        return INDEX_OF_COURSE_NOT_FOUND;
+    }
+
+    private int findInstanceIndex() {
+        Course c = courses.get(findCourseIndexByName());
+        CourseInstance instanceToFind = new CourseInstance(c, chosenDay, chosenStartHour, chosenEndHour, chosenProfessorName);
         for (int i = 0; i < courseInstances.size(); i++) {
             if (courseInstances.get(i).equals(instanceToFind)) {
                 return i;

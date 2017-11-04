@@ -30,6 +30,7 @@ public class AddSemesterActivity extends BaseActivity implements CalendarDatePic
     private static final int SEMESTER_INDEX_NOT_FOUND = -1;
 
     private ArrayList<Semester> semestersToAdd;
+    private Dashboard dashboard;
 
     private int yearSelected;
     private MyDate startDateSelected;
@@ -53,6 +54,8 @@ public class AddSemesterActivity extends BaseActivity implements CalendarDatePic
         DrawerLayout.LayoutParams dlp  = (DrawerLayout.LayoutParams)findViewById(R.id.activity_add_semester).getLayoutParams();
         dlp.setMargins(50,50,50,50);
 
+        dashboard = Dashboard.getInstance();
+
         mAuth = FirebaseAuth.getInstance();
         mFirebaseDatabase = FirebaseDatabase.getInstance();
         databaseReference = mFirebaseDatabase.getReference();
@@ -60,7 +63,7 @@ public class AddSemesterActivity extends BaseActivity implements CalendarDatePic
         FirebaseUser currentUser = mAuth.getCurrentUser();
         userID = currentUser.getUid();
 
-        semestersToAdd = new ArrayList<>();
+        semestersToAdd = dashboard.getSemesters();
 
         ArrayList<String> years = new ArrayList<>();
         int thisYear = Calendar.getInstance().get(Calendar.YEAR);

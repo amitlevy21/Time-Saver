@@ -47,14 +47,11 @@
         <item>C</item>
     </string-array>
 
-
-    //////////////
-    <string-array name="planets_array">
-        <item>A</item>
-        <item>B</item>
-        <item>C</item>
-    </string-array>
     <string name="title_activity_base">BaseActivity</string>
     <string name="task_manager_headline">Task Manager</string>
+    <string name="notifications">Notifications</string>
+    <string name="utilities">Utilities</string>
+    <string name="sync_with_google_calendar">Sync with Google Calendar</string>
+    <string name="time_to_receive_notification">Notification Time</string>
 
 </resources>

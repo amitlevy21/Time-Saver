@@ -12,9 +12,9 @@ class MyDate implements Comparable<MyDate> , Serializable{
 
     private static final long serialVersionUID = 1L;
 
-    int year;
-    int month;
-    int day;
+    private int year;
+    private int month;
+    private int day;
 
     MyDate(int year, int month, int day) {
         this.year = year;

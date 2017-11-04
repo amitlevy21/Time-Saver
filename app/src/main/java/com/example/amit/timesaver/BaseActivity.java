@@ -22,12 +22,17 @@ public class BaseActivity extends AppCompatActivity {
     protected static final int ADD_SEMESTER_DRAWER_POSITION = 2;
     protected static final int ADD_COURSE_DRAWER_POSITION = 3;
     protected static final int ADD_INSTANCE_DRAWER_POSITION = 4;
+    private static final int UTILITIES_DRAWER_POSITION = 5;
 
-    public static final String MY_ACTION = "com.sample.myaction";
 
-    DrawerBuilder drawerBuilder;
-    Drawer drawer;
+    private DrawerBuilder drawerBuilder;
+    private Drawer drawer;
 
+    private int notificationHour = 17;
+    private int notificationMinute = 0;
+
+
+    // TODO: 04/11/17 add notifications time to firebase and load
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         setTheme(R.style.AppTheme);
@@ -35,8 +40,8 @@ public class BaseActivity extends AppCompatActivity {
         setContentView(R.layout.activity_base);
 
         Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.HOUR_OF_DAY, 17);
-        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.HOUR_OF_DAY, notificationHour);
+        calendar.set(Calendar.MINUTE, notificationMinute);
         calendar.set(Calendar.SECOND, 0);
         Intent intent1 = new Intent(BaseActivity.this, AlarmReceiver.class);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(BaseActivity.this, 0,intent1, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -54,7 +59,8 @@ public class BaseActivity extends AppCompatActivity {
                         new PrimaryDrawerItem().withName("Task Manager").withIcon(R.drawable.task_manager_menu_ic).withSelectable(false),
                         new SecondaryDrawerItem().withName("Add Semester").withIcon(R.drawable.semester_menu_ic).withSelectable(false),
                         new SecondaryDrawerItem().withName("Add Course").withIcon(R.drawable.course_menu_ic).withSelectable(false),
-                        new SecondaryDrawerItem().withName("Add Course Instance").withIcon(R.drawable.instance_menu_ic).withSelectable(false)
+                        new SecondaryDrawerItem().withName("Add Course Instance").withIcon(R.drawable.instance_menu_ic).withSelectable(false),
+                        new SecondaryDrawerItem().withName("Utilities").withIcon(R.drawable.utilities_icon)
 
                 )
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
@@ -84,6 +90,10 @@ public class BaseActivity extends AppCompatActivity {
                                     intent = new Intent(BaseActivity.this, AddCourseInstanceActivity.class);
                                     break;
                                 }
+                                case UTILITIES_DRAWER_POSITION: {
+                                    intent = new Intent(BaseActivity.this, UtilitiesActivity.class);
+                                    break;
+                                }
                             }
                             if (intent != null) {
                                 BaseActivity.this.startActivity(intent);
@@ -108,6 +118,24 @@ public class BaseActivity extends AppCompatActivity {
         } else {
             super.onBackPressed();
         }
+    }
+
+    public int getNotificationHour() {
+        return notificationHour;
+    }
+
+    public int getNotificationMinute() {
+        return notificationMinute;
+    }
+
+    public void setNotificationHour(int notificationHour) {
+        // TODO: 04/11/17 add to firebase
+        this.notificationHour = notificationHour;
+    }
+
+    public void setNotificationMinute(int notificationMinute) {
+        // TODO: 04/11/17 add to firebase
+        this.notificationMinute = notificationMinute;
     }
 }
 

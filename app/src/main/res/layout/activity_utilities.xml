@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.amit.timesaver.UtilitiesActivity"
+    android:orientation="vertical"
+    android:layout_margin="@dimen/default_margin">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textStyle="bold|italic"
+        android:textSize="@dimen/large_text_size"
+        android:text="@string/utilities"
+        android:layout_marginBottom="@dimen/large_margin"/>
+
+    <TableLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/default_margin">
+
+        <TableRow
+            android:layout_marginBottom="@dimen/default_margin">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/default_text_size"
+                android:text="@string/notifications" />
+
+            <Switch
+                android:id="@+id/utilities_notification_switch"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:layout_weight="1"
+                android:checked="true"/>
+        </TableRow>
+
+
+        <TableRow
+            android:layout_marginBottom="@dimen/default_margin">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/default_text_size"
+                android:text="@string/time_to_receive_notification"/>
+
+            <TextView
+                android:id="@+id/utilities_notification_time_set"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/default_text_size"
+                android:layout_weight="1"
+                android:gravity="end" />
+
+
+        </TableRow>
+
+    </TableLayout>
+
+    <Button
+        android:id="@+id/utilities_calendar_sync_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/sync_with_google_calendar" />
+
+
+</LinearLayout>

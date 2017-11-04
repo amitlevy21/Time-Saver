@@ -12,7 +12,6 @@ class Course implements Serializable{
     private static final long serialVersionUID = 1L;
 
     private String name;
-    private String semesterTaken;
     private ArrayList<CourseInstance> courseInstances;
     private int numOfInstances;
 
@@ -20,17 +19,12 @@ class Course implements Serializable{
         courseInstances = new ArrayList<>();
     }
 
-    public Course(String name, String semesterTaken) {
+    public Course(String name) {
         this.name = name;
-        this.semesterTaken = semesterTaken;
     }
 
     public String getName() {
         return name;
-    }
-
-    public String getSemesterTaken() {
-        return semesterTaken;
     }
 
     public int getNumOfInstances() {

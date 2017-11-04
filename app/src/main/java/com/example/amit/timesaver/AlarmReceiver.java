@@ -45,7 +45,6 @@ public class AlarmReceiver extends BroadcastReceiver {
         }
 
 
-        if(notify) {
             NotificationCompat.Builder mNotifyBuilder = new NotificationCompat.Builder(
                     context).setSmallIcon(R.drawable.splash_icon)
                     .setContentTitle("Don't forget to finish you tasks for tomorrow")
@@ -57,7 +56,7 @@ public class AlarmReceiver extends BroadcastReceiver {
             notificationManager.notify(MID, mNotifyBuilder.build());
             MID++;
             notify = false;
-            }
+
         }
     }
 

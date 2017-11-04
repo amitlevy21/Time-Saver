@@ -19,7 +19,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.GenericTypeIndicator;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
@@ -30,6 +29,7 @@ import java.util.Map;
 
 public class AddCourseActivity extends BaseActivity {
 
+    private static final int INDEX_OF_SEMESTER_NOT_FOUND = -1;
     private ArrayList<Semester> semesters;
     private ArrayList<Course> courses;
     private Course course;
@@ -60,7 +60,7 @@ public class AddCourseActivity extends BaseActivity {
         FirebaseUser currentUser = mAuth.getCurrentUser();
         userID = currentUser.getUid();
 
-        semesters = new ArrayList<>();
+        semesters = Dashboard.getInstance().getSemesters();
         courses = new ArrayList<>();
         semestersSpinner = new ArrayList<>();
 
@@ -80,8 +80,9 @@ public class AddCourseActivity extends BaseActivity {
     protected void onResume() {
         super.onResume();
 
-        if (getIntent().getSerializableExtra(Keys.SEMESTERS) != null)
-            semesters = (ArrayList<Semester>) getIntent().getSerializableExtra(Keys.SEMESTERS);
+
+        /*if (getIntent().getSerializableExtra(Keys.SEMESTERS) != null)
+            semesters = (ArrayList<Semester>) getIntent().getSerializableExtra(Keys.SEMESTERS);*/
 
         //Load the semesters from database
         DatabaseReference semestersReference = databaseReference.child("users").child(userID).child("semesters").getRef();
@@ -183,9 +184,9 @@ public class AddCourseActivity extends BaseActivity {
 
     // TODO: 11/2/2017 to fix
     private void save(String courseName) {
-        Semester theSemester = findSemesterByName();
-        course = new Course(courseName, theSemester.getName());
-        theSemester.addCourse(course);
+        int theSemester = findSemesterIndexByName();
+        course = new Course(courseName);
+        semesters.get(theSemester).addCourse(course);
 
         courses.add(course);
         /*Query query = databaseReference.child("users").child(userID)
@@ -225,16 +226,17 @@ public class AddCourseActivity extends BaseActivity {
         return INDEX_OF_COURSE_NOT_FOUND;
     }
 
-    public Semester findSemesterByName() {
+
+    public int findSemesterIndexByName() {
         int semesterYear = Integer.parseInt(semesterSelected.substring(0, 4));
         Semester.eSemesterType semesterType = Semester.eSemesterType.valueOf(String.valueOf(semesterSelected.charAt(7)));
         for (int i = 0; i < semesters.size(); i++) {
             if ((semesters.get(i).getYear() == semesterYear) &&
                     (semesters.get(i).getSemesterType().equals(semesterType))) {
-                return semesters.get(i);
+                return i;
             }
         }
-        return null;
+        return INDEX_OF_SEMESTER_NOT_FOUND;
     }
 
 
