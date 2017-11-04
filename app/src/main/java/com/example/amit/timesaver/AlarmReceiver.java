@@ -5,12 +5,15 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.icu.text.DateFormat;
 import android.icu.util.Calendar;
+import android.icu.util.GregorianCalendar;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 public class AlarmReceiver extends BroadcastReceiver {
 
@@ -18,6 +21,8 @@ public class AlarmReceiver extends BroadcastReceiver {
     private ArrayList<Task> tasks = TaskManager.getInstance().getPendingTasks();
     boolean notify = false;
     private MyDate day;
+    private Calendar calendar;
+    private int tomorrow1, tomorrow2;
     public static final String MY_ACTION = "com.sample.myaction";
 
     @Override
@@ -37,21 +42,25 @@ public class AlarmReceiver extends BroadcastReceiver {
 
         Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
-        day = new MyDate(Calendar.YEAR, Calendar.MONTH, Calendar.DAY_OF_MONTH+1);
+
+        calendar = Calendar.getInstance();
+        tomorrow1 = (calendar.get(Calendar.YEAR)) * (calendar.get(Calendar.MONTH)+1) * (calendar.get(Calendar.DAY_OF_MONTH)+1);
+
 
         for(int i = 0; i < tasks.size(); i++){
-            if((tasks.get(i).getDueDate().compareTo(day))== 0)
+            day = tasks.get(i).getDueDate();
+            tomorrow2 = ((day.getDay()) * (day.getMonth()+1) * (day.getYear()));
+            if(tomorrow1 == tomorrow2)
                 notify = true;
         }
 
 
             NotificationCompat.Builder mNotifyBuilder = new NotificationCompat.Builder(
-                    context).setSmallIcon(R.drawable.splash_icon)
-                    .setContentTitle("Don't forget to finish you tasks for tomorrow")
-                    .setContentText("Events to be Performed").setSound(alarmSound)
+                    context).setSmallIcon(R.drawable.logo_in_app)
+                    .setContentTitle("Don't forget to finish your tasks for tomorrow")
+                    .setContentText("Click here to enter Dashboard").setSound(alarmSound)
                     .setAutoCancel(true).setWhen(when)
-                    .setContentIntent(pendingIntent)
-                    .setVibrate(new long[]{1000, 1000, 1000, 1000, 1000});
+                    .setContentIntent(pendingIntent);
 
             notificationManager.notify(MID, mNotifyBuilder.build());
             MID++;

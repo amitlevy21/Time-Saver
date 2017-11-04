@@ -24,6 +24,7 @@ public class BaseActivity extends AppCompatActivity {
     protected static final int ADD_INSTANCE_DRAWER_POSITION = 4;
     private static final int UTILITIES_DRAWER_POSITION = 5;
 
+    public static final String MY_ACTION = "com.sample.myaction";
 
     private DrawerBuilder drawerBuilder;
     private Drawer drawer;
