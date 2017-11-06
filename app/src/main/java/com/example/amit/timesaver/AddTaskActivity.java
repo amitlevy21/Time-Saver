@@ -15,10 +15,12 @@ import com.codetroopers.betterpickers.calendardatepicker.CalendarDatePickerDialo
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.HashMap;
 
 public class AddTaskActivity extends BaseActivity implements CalendarDatePickerDialogFragment.OnDateSetListener {
 
-    private Semester semesterRelated;
+
     private String courseNameSelected;
     private MyDate dueDate;
 
@@ -30,19 +32,22 @@ public class AddTaskActivity extends BaseActivity implements CalendarDatePickerD
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_task);
 
-        Bundle bundle = getIntent().getExtras();
-        semesterRelated =(Semester) bundle.getSerializable(Keys.SEMESTER);
+//        Bundle bundle = getIntent().getExtras();
+//        semesterRelated = (Semester) bundle.getSerializable(Keys.SEMESTER);
 
 
-        ArrayList<Course> courses = semesterRelated.getCourses();
-        ArrayList<String> names = new ArrayList<>(semesterRelated.getNumOfCourses());
+        //i meant here to copy references not values
+        ArrayList<Course> courses = Dashboard.getInstance().getCourses();
+        ArrayList<String> names = new ArrayList<>();
 
-        for(Course course : courses) {
-            names.add(course.getName());
+        for(Course c: courses) {
+            if(!names.contains(c.getName()))
+            names.add(c.getName());
         }
 
-        ArrayAdapter<String> coursesNames = new ArrayAdapter<>(this,android.R.layout.simple_spinner_item, names);
-        Spinner coursesSpinner = (Spinner) findViewById(R.id.add_task_course_spinner);
+
+        ArrayAdapter<String> coursesNames = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, names);
+        Spinner coursesSpinner = findViewById(R.id.add_task_course_spinner);
 
         coursesNames.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
@@ -59,7 +64,7 @@ public class AddTaskActivity extends BaseActivity implements CalendarDatePickerD
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 adapterView.setSelection(i);
-                courseNameSelected = (String)adapterView.getSelectedItem();
+                courseNameSelected = (String) adapterView.getSelectedItem();
             }
 
             @Override
@@ -69,11 +74,10 @@ public class AddTaskActivity extends BaseActivity implements CalendarDatePickerD
             }
         });
 
-        Button setDueDateButton = (Button) findViewById(R.id.add_task_due_date_button);
+        Button setDueDateButton = findViewById(R.id.add_task_due_date_button);
         setDueDateButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(getApplicationContext(), "clicked", Toast.LENGTH_SHORT).show();
                 CalendarDatePickerDialogFragment cdp = new CalendarDatePickerDialogFragment()
                         .setOnDateSetListener(AddTaskActivity.this)
                         .setFirstDayOfWeek(Calendar.SUNDAY)
@@ -82,15 +86,13 @@ public class AddTaskActivity extends BaseActivity implements CalendarDatePickerD
                 cdp.show(getSupportFragmentManager(), FRAG_DATE_PICKER);
             }
         });
-        Button confirm = (Button) findViewById(R.id.add_task_confirm_button);
+        Button confirm = findViewById(R.id.add_task_confirm_button);
 
         confirm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                EditText description = (EditText) findViewById(R.id.task_description);
-                Course courseRelated = semesterRelated.getCourseByName(courseNameSelected);
-                TextView dueDateTextView = (TextView) findViewById(R.id.task_manager_date_due);
-
+                EditText description = findViewById(R.id.task_description);
+                Course courseRelated = getCourseByName(courseNameSelected);
 
                 Task taskToAdd = new Task(courseRelated, dueDate, description.getText().toString());
                 Intent intent = new Intent(getApplicationContext(), TaskManagerActivity.class);
@@ -101,8 +103,18 @@ public class AddTaskActivity extends BaseActivity implements CalendarDatePickerD
         });
     }
 
+    private Course getCourseByName(String courseNameSelected) {
+        ArrayList<Course> courses = Dashboard.getInstance().getCourses();
+        for (Course c: courses) {
+            if(c.getName().equals(courseNameSelected)) {
+                return c;
+            }
+        }
+        return null;
+    }
+
     @Override
     public void onDateSet(CalendarDatePickerDialogFragment dialog, int year, int monthOfYear, int dayOfMonth) {
         dueDate = new MyDate(year, monthOfYear, dayOfMonth);
-        }
+    }
 }

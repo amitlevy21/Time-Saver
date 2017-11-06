@@ -11,6 +11,13 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.GenericTypeIndicator;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.List;
 
@@ -25,6 +32,12 @@ public class TaskManagerActivity extends BaseActivity {
 
     private List<Task> taskList;
 
+    private FirebaseAuth mAuth;
+    private FirebaseDatabase mFireBaseDataBase;
+    private DatabaseReference databaseReference;
+
+    private String userID;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,8 +49,14 @@ public class TaskManagerActivity extends BaseActivity {
         dlp.setMargins(50,50,50,50);
 
 
+        mFireBaseDataBase = FirebaseDatabase.getInstance();
+        mAuth = FirebaseAuth.getInstance();
+        databaseReference = mFireBaseDataBase.getReference();
+
+        userID = mAuth.getUid();
+
         taskManager = TaskManager.getInstance();
-        recyclerView = (RecyclerView) findViewById(R.id.task_manager_recycler_view);
+        recyclerView = findViewById(R.id.task_manager_recycler_view);
         taskList = taskManager.getPendingTasks();
         tasksAdapter = new TasksAdapter(taskList);
 
@@ -49,7 +68,7 @@ public class TaskManagerActivity extends BaseActivity {
 
         //to delete
         semesterRelated = new Semester(1994, new MyDate(1994,12,28), new MyDate(1995,12,28), Semester.eSemesterType.A);
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.task_manager_fab);
+        FloatingActionButton fab = findViewById(R.id.task_manager_fab);
 
         //add task
         fab.setOnClickListener(new View.OnClickListener() {
@@ -74,26 +93,31 @@ public class TaskManagerActivity extends BaseActivity {
             }
         });
 
-        //after we add a task need to call
-        //tasksAdapter.notifyDataSetChanged();
-        testRecyclerView();
-
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
 
-    // TODO: 10/25/2017 Remove method and build dialog that takes input and a fab button maybe
-    /** test method */
-    public void testRecyclerView() {
+        DatabaseReference tasksFromFireBase = databaseReference.child("users").child(userID).child("tasks");
+        tasksFromFireBase.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                GenericTypeIndicator<Task> t  = new GenericTypeIndicator<Task>() {};
+                for (DataSnapshot snapshot: dataSnapshot.getChildren()) {
+                    Task task = snapshot.getValue(t);
+                    if(!taskList.contains(task)) {
+                        taskList.add(task);
+                        tasksAdapter.notifyDataSetChanged();
+                    }
+                }
+            }
 
-    for (int i = 0; i < 20; i++) {
-        Course c = new Course("course" + i);
-        Task taskToAdd = new Task(c, new MyDate(1994,2,14), "description " + i);
-        taskList.add(taskToAdd);
-        semesterRelated.addCourse(c);
-        taskManager.addTask(taskToAdd);
-    }
-    tasksAdapter.notifyDataSetChanged();
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
 
+            }
+        });
     }
 
     @Override
@@ -101,9 +125,12 @@ public class TaskManagerActivity extends BaseActivity {
         if(data != null) { // data can be null if user pressed back
             Bundle taskAddedBundle = data.getExtras();
             Task task = (Task) taskAddedBundle.getSerializable(Keys.TASK_ADDED);
-            taskList.add(task);
-            tasksAdapter.notifyDataSetChanged();
-            // TODO: 11/2/2017 add to firebase
+            if (!taskList.contains(task)) {
+                taskList.add(task);
+                tasksAdapter.notifyDataSetChanged();
+                databaseReference.child("users").child(userID).child("tasks").push().setValue(task);
+            }
+
         }
     }
 }

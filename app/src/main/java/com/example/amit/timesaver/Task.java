@@ -17,6 +17,9 @@ public class Task implements Comparable<Task>, Serializable {
     private String description;
     private boolean done;
 
+    public Task() {
+    }
+
     public Task(Course relatedCourse, MyDate dueDate, String description) {
         this.relatedCourse = relatedCourse;
         this.dueDate = dueDate;
@@ -50,5 +53,14 @@ public class Task implements Comparable<Task>, Serializable {
     @Override
     public int compareTo(@NonNull Task task) {
         return dueDate.compareTo(task.dueDate);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(obj instanceof Task) {
+            Task temp = (Task)obj;
+            return relatedCourse.equals(temp.relatedCourse) && dueDate.equals(temp.dueDate) && description.equals(temp.description);
+        }
+        return false;
     }
 }

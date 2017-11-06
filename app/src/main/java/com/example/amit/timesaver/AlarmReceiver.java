@@ -55,18 +55,18 @@ public class AlarmReceiver extends BroadcastReceiver {
         }
 
 
-            NotificationCompat.Builder mNotifyBuilder = new NotificationCompat.Builder(
-                    context).setSmallIcon(R.drawable.logo_in_app)
-                    .setContentTitle("Don't forget to finish your tasks for tomorrow")
-                    .setContentText("Click here to enter Dashboard").setSound(alarmSound)
-                    .setAutoCancel(true).setWhen(when)
-                    .setContentIntent(pendingIntent);
+        NotificationCompat.Builder mNotifyBuilder = new NotificationCompat.Builder(
+                context).setSmallIcon(R.drawable.logo_in_app)
+                .setContentTitle("Don't forget to finish your tasks for tomorrow")
+                .setContentText("Click here to enter Dashboard").setSound(alarmSound)
+                .setAutoCancel(true).setWhen(when)
+                .setContentIntent(pendingIntent);
 
-            notificationManager.notify(MID, mNotifyBuilder.build());
-            MID++;
-            notify = false;
+        notificationManager.notify(MID, mNotifyBuilder.build());
+        MID++;
+        notify = false;
 
-        }
     }
+}
 
 

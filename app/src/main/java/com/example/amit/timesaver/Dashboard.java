@@ -78,7 +78,7 @@ public class Dashboard implements Serializable{
     public ArrayList<Course> getCourses() {
         ArrayList<Course> toReturn = new ArrayList<>(semesters.size());
         for (Semester s: semesters) {
-            toReturn.addAll(s.getCourses());
+            toReturn.addAll(s.getCourses().values());
         }
         return toReturn;
     }

@@ -7,7 +7,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.TextView;
@@ -25,10 +24,10 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.MyViewHolder
 
             public MyViewHolder(View view) {
                 super(view);
-                taskSubject = (TextView) view.findViewById(R.id.task_subject);
-                taskDescription = (TextView) view.findViewById(R.id.task_description);
-                taskStatus = (CheckBox) view.findViewById(R.id.task_checkbox_done);
-                taskDueDate = (TextView) view.findViewById(R.id.task_manager_date_due);
+                taskSubject = view.findViewById(R.id.task_subject);
+                taskDescription = view.findViewById(R.id.task_description);
+                taskStatus = view.findViewById(R.id.task_checkbox_done);
+                taskDueDate = view.findViewById(R.id.task_manager_date_due);
 
                 view.setOnLongClickListener(new View.OnLongClickListener() {
                     @Override

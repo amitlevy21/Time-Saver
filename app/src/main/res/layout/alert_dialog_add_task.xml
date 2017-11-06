@@ -33,12 +33,12 @@
         android:layout_height="48dp"
         android:inputType="textCapSentences"
         android:maxLines="1"
-        android:hint="Description"/>
+        android:hint="@string/add_task_dialog_description"/>
 
     <Button
         android:id="@+id/add_task_due_date_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Due Date"/>
+        android:text="@string/add_task_dialog_due_date"/>
 
 </LinearLayout>

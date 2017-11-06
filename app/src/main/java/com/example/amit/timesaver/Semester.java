@@ -4,6 +4,7 @@ package com.example.amit.timesaver;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Created by amit on 13/10/17.
@@ -20,12 +21,12 @@ public class Semester implements Serializable{
     private MyDate startDate;
     private MyDate endDate;
     private int numOfCourses;
-    private ArrayList<Course> courses;
+    private HashMap<String,Course> courses;
     private eSemesterType semesterType;
     private String name;
 
     public Semester() {
-        courses = new ArrayList<>();
+        courses = new HashMap<>();
     }
 
     public Semester(int year, MyDate startDate, MyDate endDate, eSemesterType semesterType) {
@@ -34,11 +35,11 @@ public class Semester implements Serializable{
         this.endDate = endDate;
         this.semesterType = semesterType;
         name = year +" - " + semesterType.name();
-        courses = new ArrayList<>();
+        courses = new HashMap<>();
     }
 
-    public void addCourse(Course course) {
-        courses.add(course);
+    public void addCourse(String semesterKey, Course course) {
+        courses.put(semesterKey, course);
         numOfCourses++;
     }
 
@@ -49,7 +50,7 @@ public class Semester implements Serializable{
     }
 
     public Course getCourseByName (String courseName) {
-        for (Course course : courses) {
+        for (Course course : courses.values()) {
             if (course.getName().equals(courseName))
                 return course;
         }
@@ -60,7 +61,7 @@ public class Semester implements Serializable{
         return name;
     }
 
-    public ArrayList<Course> getCourses() {
+    public HashMap<String, Course> getCourses() {
         return courses;
     }
 

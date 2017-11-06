@@ -17,19 +17,38 @@
         android:layout_marginBottom="@dimen/large_margin"/>
 
     <TextView
-        android:id="@+id/select_course_from_spinner"
+        android:id="@+id/add_instance_text_semester"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/headline_instance"
+        android:textSize="@dimen/default_text_size"
+        android:text="@string/add_instance_select_semester"/>
+
+    <Spinner
+        android:id="@+id/add_instance_spinner_semester"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/headline_instance"
+        android:layout_toEndOf="@id/add_instance_text_semester">
+
+    </Spinner>
+
+    <TextView
+        android:id="@+id/select_course_from_spinner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/add_instance_text_semester"
         android:text="@string/select_course"
-        android:textSize="@dimen/default_text_size"/>
+        android:textSize="@dimen/default_text_size"
+        android:layout_marginTop="@dimen/default_margin"/>
 
     <Spinner
         android:id="@+id/course_spinner"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/headline_instance"
-        android:layout_toEndOf="@id/select_course_from_spinner"/>
+        android:layout_below="@id/add_instance_text_semester"
+        android:layout_toEndOf="@id/select_course_from_spinner"
+        android:layout_marginTop="@dimen/default_margin"/>
 
     <TextView
         android:id="@+id/weekdays_choice"

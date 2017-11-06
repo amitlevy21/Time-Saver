@@ -65,6 +65,15 @@ class MyDate implements Comparable<MyDate> , Serializable{
     }
 
     @Override
+    public boolean equals(Object obj) {
+        if(obj instanceof MyDate) {
+            MyDate temp = (MyDate)obj;
+            return day == temp.day && month == temp.month && year == temp.year;
+        }
+        return false;
+    }
+
+    @Override
     public String toString() {
         return day + "/" + (month+ 1) + "/" + year;
     }

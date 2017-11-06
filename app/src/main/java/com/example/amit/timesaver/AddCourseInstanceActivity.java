@@ -26,12 +26,17 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.GenericTypeIndicator;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class AddCourseInstanceActivity extends BaseActivity implements RadialTimePickerDialogFragment.OnTimeSetListener,
@@ -40,6 +45,7 @@ public class AddCourseInstanceActivity extends BaseActivity implements RadialTim
 
     private static final int INDEX_OF_INSTANCE_NOT_FOUND = -1;
     private static final int INDEX_OF_COURSE_NOT_FOUND = -1;
+    private String chosenSemester;
     private String chosenCourse;
     private CourseInstance.eDay chosenDay;
     private int chosenStartHour;
@@ -59,8 +65,12 @@ public class AddCourseInstanceActivity extends BaseActivity implements RadialTim
     private FirebaseAuth mAuth;
     private DatabaseReference databaseReference;
     private ArrayList<String> coursesNames;
-
-
+    private ArrayList<String> semestersNames;
+    private Spinner spinSemester;
+    private ArrayAdapter<String> adapterCourseSpinner;
+    private ArrayAdapter<String> adapterSemesterSpinner;
+    private Spinner spinCourses;
+    private ArrayList<Semester> semesters;
 
 
     @Override
@@ -74,6 +84,7 @@ public class AddCourseInstanceActivity extends BaseActivity implements RadialTim
 
         courseInstances = new ArrayList<>();
         coursesNames = new ArrayList<>();
+        semestersNames = new ArrayList<>();
 
         mAuth = FirebaseAuth.getInstance();
         mFirebaseDatabase = FirebaseDatabase.getInstance();
@@ -97,39 +108,61 @@ public class AddCourseInstanceActivity extends BaseActivity implements RadialTim
     @Override
     protected void onResume() {
         super.onResume();
+        semesters = Dashboard.getInstance().getSemesters();
         courses = Dashboard.getInstance().getCourses();
+        spinCourses = findViewById(R.id.course_spinner);
 
         /*if (getIntent().getSerializableExtra(Keys.COURSES) != null)
             courses = (ArrayList<Course>) getIntent().getSerializableExtra(Keys.COURSES);*/
 
-        DatabaseReference semestersReference = databaseReference.child("users").child(userID).child("courses").getRef();
-        semestersReference.addValueEventListener(new ValueEventListener() {
+        spinSemester = findViewById(R.id.add_instance_spinner_semester);
+
+        spinSemester.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                // TODO: 04/11/17 Solve
-                /*
-                Toast.makeText(getApplicationContext(), "instance read", Toast.LENGTH_SHORT).show();
-
-                GenericTypeIndicator<HashMap<String,Course>> t = new GenericTypeIndicator<HashMap<String,Course>>() {};
-
-                HashMap<String,Course> coursesFromFireBase = dataSnapshot.getValue(t);
-
-                for(Map.Entry<String, Course> entry : coursesFromFireBase.entrySet()) {
-                    coursesNames.add(entry.getValue().getName());
-                }
-                Collections.sort(coursesNames);*/
-
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                adapterView.setSelection(i);
+                chosenSemester = adapterView.getSelectedItem().toString();
             }
 
             @Override
-            public void onCancelled(DatabaseError databaseError) {
-
+            public void onNothingSelected(AdapterView<?> adapterView) {
+                adapterView.setSelection(0);
+                chosenSemester = adapterView.getSelectedItem().toString();
             }
         });
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, coursesNames);
-        Spinner spinCourses = (Spinner) findViewById(R.id.course_spinner);
-        spinCourses.setAdapter(adapter);
+        spinCourses.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                adapterView.setSelection(i);
+                chosenCourse = adapterView.getSelectedItem().toString();
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+                adapterView.setSelection(0);
+                chosenCourse = adapterView.getSelectedItem().toString();
+            }
+        });
+
+        for (Course c: courses) {
+            if(!coursesNames.contains(c.getName()))
+                coursesNames.add(c.getName());
+        }
+
+        for (Semester s: semesters) {
+            if(!semestersNames.contains(s.getName()))
+                semestersNames.add(s.getName());
+        }
+
+        adapterSemesterSpinner = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, semestersNames);
+        adapterCourseSpinner = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, coursesNames);
+
+        spinCourses.setAdapter(adapterCourseSpinner);
+
+        spinSemester.setAdapter(adapterSemesterSpinner);
+
     }
 
     @Override
@@ -138,15 +171,14 @@ public class AddCourseInstanceActivity extends BaseActivity implements RadialTim
         switch (dialog.getTag()) {
             case FRAG_TAG_TIME_PICKER_START: {
                 chosenStartHour = hourOfDay * 100 + minute;
-                TextView startHourButton = (TextView) findViewById(R.id.start_hour_button);
+                TextView startHourButton = findViewById(R.id.start_hour_button);
                 String hourToDisplay;
                 if (chosenStartHour < 1000) {
-                    if(minute < 10)
+                    if (minute < 10)
                         hourToDisplay = "0" + hourOfDay + ":0" + minute;
                     else
                         hourToDisplay = "0" + hourOfDay + ":" + minute;
-                }
-                else
+                } else
                     hourToDisplay = String.valueOf(chosenStartHour);
                 startHourButton.setText(String.valueOf(hourToDisplay));
                 break;
@@ -154,16 +186,15 @@ public class AddCourseInstanceActivity extends BaseActivity implements RadialTim
             case FRAG_TAG_TIME_PICKER_END: {
                 if (hourOfDay * 100 + minute > chosenStartHour) {
                     chosenEndHour = hourOfDay * 100 + minute;
-                    TextView endHourButton = (TextView) findViewById(R.id.end_hour_button);
+                    TextView endHourButton = findViewById(R.id.end_hour_button);
                     String hourToDisplay;
                     if (chosenEndHour < 1000) {
-                        if(minute < 10)
+                        if (minute < 10)
                             hourToDisplay = "0" + hourOfDay + ":0" + minute;
                         else
                             hourToDisplay = "0" + hourOfDay + ":" + minute;
-                    }
-                    else
-                        hourToDisplay = String.valueOf(chosenEndHour);
+                    } else
+                        hourToDisplay = hourOfDay + ":" + minute;
                     endHourButton.setText(String.valueOf(hourToDisplay));
                 } else {
                     Toast.makeText(getApplicationContext(), "Please choose valid hours", Toast.LENGTH_LONG).show();
@@ -183,7 +214,7 @@ public class AddCourseInstanceActivity extends BaseActivity implements RadialTim
         int dayOfWeek = myCalendar.get(Calendar.DAY_OF_WEEK);
 
         chosenDay = CourseInstance.eDay.values()[dayOfWeek - 1];
-        TextView dayTaken = (TextView) findViewById(R.id.day_taken_button);
+        TextView dayTaken = findViewById(R.id.day_taken_button);
         dayTaken.setText(chosenDay.name());
 
     }
@@ -191,23 +222,7 @@ public class AddCourseInstanceActivity extends BaseActivity implements RadialTim
 
     private void addListeners() {
 
-        Spinner spinCourses = (Spinner) findViewById(R.id.course_spinner);
-
-        spinCourses.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                chosenCourse = adapterView.getSelectedItem().toString();
-                adapterView.setSelection(i);
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-                chosenCourse = adapterView.getSelectedItem().toString();
-                adapterView.setSelection(0);
-            }
-        });
-
-        TextView dayTaken = (TextView) findViewById(R.id.day_taken_button);
+        TextView dayTaken = findViewById(R.id.day_taken_button);
         dayTaken.setOnClickListener(new View.OnClickListener() {
             //thanks android-better-pickers
             @Override
@@ -221,7 +236,7 @@ public class AddCourseInstanceActivity extends BaseActivity implements RadialTim
             }
         });
 
-        TextView startHourButton = (TextView) findViewById(R.id.start_hour_button);
+        TextView startHourButton = findViewById(R.id.start_hour_button);
         startHourButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -232,7 +247,7 @@ public class AddCourseInstanceActivity extends BaseActivity implements RadialTim
             }
         });
 
-        TextView endHourButton = (TextView) findViewById(R.id.end_hour_button);
+        TextView endHourButton = findViewById(R.id.end_hour_button);
         endHourButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -243,7 +258,7 @@ public class AddCourseInstanceActivity extends BaseActivity implements RadialTim
             }
         });
 
-        final EditText professorNameText = (EditText) findViewById(R.id.professor_name_input);
+        final EditText professorNameText = findViewById(R.id.professor_name_input);
         professorNameText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -261,7 +276,7 @@ public class AddCourseInstanceActivity extends BaseActivity implements RadialTim
             }
         });
 
-        Button confirmButton = (Button) findViewById(R.id.button_confirm_add_instance);
+        Button confirmButton = findViewById(R.id.button_confirm_add_instance);
         confirmButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -273,7 +288,7 @@ public class AddCourseInstanceActivity extends BaseActivity implements RadialTim
             }
         });
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.add_instance_fab);
+        FloatingActionButton fab = findViewById(R.id.add_instance_fab);
 
 
         //add course
@@ -306,11 +321,10 @@ public class AddCourseInstanceActivity extends BaseActivity implements RadialTim
     }
 
 
-
     // TODO: 11/2/2017 fix firebase
     private boolean save() {
-        CourseInstance courseInstance;
-        Course course = courses.get(findCourseIndexByName());
+        final CourseInstance courseInstance;
+        final Course course = courses.get(findCourseIndexByName());
         if (chosenProfessorName != null) {
             courseInstance = new CourseInstance
                     (course, chosenDay, chosenStartHour, chosenEndHour, chosenProfessorName);
@@ -318,9 +332,48 @@ public class AddCourseInstanceActivity extends BaseActivity implements RadialTim
             courseInstance = new CourseInstance(course, chosenDay, chosenStartHour, chosenEndHour);
         }
         courseInstances.add(courseInstance);
-        course.addInstance(courseInstance);
-       // databaseReference.child("users").child(userID).child("semesters")
-       //         .push().child("courses").push().child("instances").push().setValue(courseInstance);
+
+        Query querySemester = databaseReference.child("users").child(userID)
+                .child("semesters").orderByChild("name").equalTo(chosenSemester);
+
+        querySemester.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                String semesterKey = dataSnapshot.getChildren().iterator().next().getKey();
+                Query queryCourse = dataSnapshot.getRef().child(semesterKey).
+                        child("courses").orderByChild("name").equalTo(chosenCourse);
+                queryCourse.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        if(dataSnapshot.exists()) {
+                            DatabaseReference courseData = dataSnapshot.getRef();
+                            String courseKey = dataSnapshot.getChildren().iterator().next().getKey();
+                            Course foundCourse = dataSnapshot.getChildren().iterator().next().getValue(Course.class);
+                            courseData.child(courseKey).child("instances").push().setValue(courseInstance);
+                            int theCourse = findCourseIndexByName();
+                            courses.get(theCourse).addInstance(courseKey, courseInstance);
+                            Toast.makeText(getApplicationContext(), "Instance successfully added!", Toast.LENGTH_LONG).show();
+
+                            course.addInstance(courseKey, courseInstance);
+
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+
+
         return true;
     }
 

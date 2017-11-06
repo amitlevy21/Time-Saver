@@ -19,6 +19,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.GenericTypeIndicator;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
@@ -58,7 +59,9 @@ public class AddCourseActivity extends BaseActivity {
         databaseReference = mFirebaseDatabase.getReference();
 
         FirebaseUser currentUser = mAuth.getCurrentUser();
-        userID = currentUser.getUid();
+        if (currentUser != null) {
+            userID = currentUser.getUid();
+        }
 
         semesters = Dashboard.getInstance().getSemesters();
         courses = new ArrayList<>();
@@ -90,13 +93,15 @@ public class AddCourseActivity extends BaseActivity {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Toast.makeText(getApplicationContext(), "read add course", Toast.LENGTH_SHORT).show();
-                GenericTypeIndicator<HashMap<String,Semester>> t = new GenericTypeIndicator<HashMap<String,Semester>>() {};
+                GenericTypeIndicator<HashMap<String, Semester>> t = new GenericTypeIndicator<HashMap<String, Semester>>() {};
 
-                HashMap<String,Semester> semestersFromFireBase = dataSnapshot.getValue(t);
+                HashMap<String, Semester> semestersFromFireBase = dataSnapshot.getValue(t);
 
-                for(Map.Entry<String, Semester> entry : semestersFromFireBase.entrySet()) {
-                    semestersSpinner.add(entry.getValue().getName());
-                    semesters.add(entry.getValue());
+                if (semestersFromFireBase != null) {
+                    for (Map.Entry<String, Semester> entry : semestersFromFireBase.entrySet()) {
+                        semestersSpinner.add(entry.getValue().getName());
+                        semesters.add(entry.getValue());
+                    }
                 }
                 Collections.sort(semestersSpinner, new SemesterNameComparator());
                 adapter.notifyDataSetChanged();
@@ -110,7 +115,7 @@ public class AddCourseActivity extends BaseActivity {
 
         adapter = new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_spinner_item, semestersSpinner);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        Spinner spinSemester = (Spinner) findViewById(R.id.semester_spinner);
+        Spinner spinSemester = findViewById(R.id.semester_spinner);
         spinSemester.setAdapter(adapter);
         spinSemester.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -129,12 +134,12 @@ public class AddCourseActivity extends BaseActivity {
 
     private void setListeners() {
 
-        Button confirmCourseButton = (Button) findViewById(R.id.button_confirm_add_course);
+        Button confirmCourseButton = findViewById(R.id.button_confirm_add_course);
         confirmCourseButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
-                EditText txtDescription = (EditText) findViewById(R.id.course_name_input);
+                EditText txtDescription = findViewById(R.id.course_name_input);
                 String courseName = txtDescription.getText().toString();
                 if (checkInput(courseName)) {
                     save(courseName);
@@ -146,13 +151,13 @@ public class AddCourseActivity extends BaseActivity {
             }
         });
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.add_course_fab);
+        FloatingActionButton fab = findViewById(R.id.add_course_fab);
 
         //add course
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                EditText txtDescription = (EditText) findViewById(R.id.course_name_input);
+                EditText txtDescription = findViewById(R.id.course_name_input);
                 String courseName = txtDescription.getText().toString();
                 if (checkInput(courseName)) {
                     save(courseName);
@@ -164,9 +169,9 @@ public class AddCourseActivity extends BaseActivity {
         fab.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
-                EditText txtDescription = (EditText) findViewById(R.id.course_name_input);
+                EditText txtDescription = findViewById(R.id.course_name_input);
                 String courseName = txtDescription.getText().toString();
-                if(checkInput(courseName)) {
+                if (checkInput(courseName)) {
                     delete(courseName);
                 }
                 return true;
@@ -182,22 +187,25 @@ public class AddCourseActivity extends BaseActivity {
         return false;
     }
 
-    // TODO: 11/2/2017 to fix
     private void save(String courseName) {
-        int theSemester = findSemesterIndexByName();
+
         course = new Course(courseName);
-        semesters.get(theSemester).addCourse(course);
+
 
         courses.add(course);
-        /*Query query = databaseReference.child("users").child(userID)
+        Query query = databaseReference.child("users").child(userID)
                 .child("semesters").orderByChild("name").equalTo(semesterSelected);
         final String key = query.getRef().getKey();
-        query.addValueEventListener(new ValueEventListener() {
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if(dataSnapshot.exists()) {
                     DatabaseReference semesterData = dataSnapshot.getRef();
-                    semesterData.child(key).setValue(course);
+                    String semesterKey = dataSnapshot.getChildren().iterator().next().getKey();
+                    Semester foundSemester = dataSnapshot.getChildren().iterator().next().getValue(Semester.class);
+                    semesterData.child(semesterKey).child("courses").push().setValue(course);
+                    int theSemester = findSemesterIndexByName();
+                    semesters.get(theSemester).addCourse(semesterKey, course);
                     Toast.makeText(getApplicationContext(), "Course successfully added!", Toast.LENGTH_LONG).show();
 
                 }
@@ -207,14 +215,18 @@ public class AddCourseActivity extends BaseActivity {
             public void onCancelled(DatabaseError databaseError) {
 
             }
-        });*/
+        });
     }
 
     private void delete(String courseName) {
         int indexOfCourse = findCourseIndexByName(courseName);
         if (indexOfCourse != INDEX_OF_COURSE_NOT_FOUND) {
             // TODO: 11/2/2017 remove from firebase
+            Course CourseToDelete = courses.get(indexOfCourse);
             courses.remove(indexOfCourse);
+
+            //Query findCourse = databaseReference.child("users").child(userID).child("semesters").orderByChild("name").equalTo(semesterNameToFind);
+
         }
     }
 

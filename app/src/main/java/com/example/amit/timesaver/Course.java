@@ -2,6 +2,7 @@ package com.example.amit.timesaver;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Created by amit on 13/10/17.
@@ -12,11 +13,10 @@ class Course implements Serializable{
     private static final long serialVersionUID = 1L;
 
     private String name;
-    private ArrayList<CourseInstance> courseInstances;
+    private HashMap<String, CourseInstance> courseInstances = new HashMap<>();
     private int numOfInstances;
 
     public Course() {
-        courseInstances = new ArrayList<>();
     }
 
     public Course(String name) {
@@ -35,8 +35,8 @@ class Course implements Serializable{
         return courseInstances.get(index);
     }
 
-    public void addInstance(CourseInstance courseInstance) {
-        courseInstances.add(courseInstance);
+    public void addInstance(String courseKey, CourseInstance courseInstance) {
+        courseInstances.put(courseKey, courseInstance);
         numOfInstances++;
     }
 
@@ -46,13 +46,16 @@ class Course implements Serializable{
             numOfInstances--;
     }
 
-    public ArrayList<CourseInstance> getCourseInstances() {
+    public HashMap<String, CourseInstance> getCourseInstances() {
         return courseInstances;
     }
 
     @Override
     public boolean equals(Object obj) {
-        Course temp = (Course)obj;
-        return name.equals(temp.getName());
+        if(obj instanceof Course) {
+            Course temp = (Course) obj;
+            return name.equals(temp.getName());
+        }
+        return false;
     }
 }

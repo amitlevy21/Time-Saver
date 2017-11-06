@@ -58,7 +58,10 @@ class CourseInstance implements Serializable{
 
     @Override
     public boolean equals(Object obj) {
-        CourseInstance temp = (CourseInstance)obj;
-        return course.equals(temp.getCourse()) && startHour == temp.getStartHour();
+        if(obj instanceof CourseInstance) {
+            CourseInstance temp = (CourseInstance) obj;
+            return course.equals(temp.getCourse()) && startHour == temp.getStartHour();
+        }
+        return false;
     }
 }
