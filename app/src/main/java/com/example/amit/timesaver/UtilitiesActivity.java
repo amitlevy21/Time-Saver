@@ -6,10 +6,12 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.icu.util.Calendar;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.CalendarContract;
 import android.support.annotation.NonNull;
 import android.view.View;
 import android.widget.Button;
@@ -31,6 +33,7 @@ import com.google.api.client.util.DateTime;
 import com.google.api.client.util.ExponentialBackOff;
 import com.google.api.services.calendar.CalendarScopes;
 import com.google.api.services.calendar.model.Event;
+import com.google.api.services.calendar.model.EventDateTime;
 import com.google.api.services.calendar.model.Events;
 
 
@@ -63,11 +66,16 @@ public class UtilitiesActivity extends BaseActivity implements EasyPermissions.P
 
     private static final String FRAG_TAG_TIME_PICKER = "Notification Time";
 
+    private ArrayList <Semester> semesters;
+    private ArrayList<Course> courses;
+    private ArrayList<CourseInstance> courseInstances;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_utilities);
+
+        semesters = Dashboard.getInstance().getSemesters();
 
         syncWithCalendarButton = findViewById(R.id.utilities_calendar_sync_button);
         setNotificationTime = findViewById(R.id.utilities_notification_time_set);
@@ -338,6 +346,56 @@ public class UtilitiesActivity extends BaseActivity implements EasyPermissions.P
             } else {
                 Toast.makeText(getApplicationContext(), "Request cancelled.", Toast.LENGTH_SHORT).show();
             }
+        }
+
+        public void syncToCalendar() throws IOException{
+            Calendar date1 = Calendar.getInstance();
+            Calendar date2 = Calendar.getInstance();
+            for(int i = 0; i < semesters.size(); i++){
+                courses = semesters.get(i).getCourses();
+                date1.clear();
+                date1.set(semesters.get(i).getStartDate().getYear(), semesters.get(i).getStartDate().getMonth(), semesters.get(i).getStartDate().getDay());
+                date2.clear();
+                date2.set(semesters.get(i).getEndDate().getYear(), semesters.get(i).getEndDate().getMonth(), semesters.get(i).getEndDate().getDay());
+                long diff = date2.getTimeInMillis() - date1.getTimeInMillis();
+                float dayCount = (float) diff / (24 * 60 * 60 * 1000);
+                for(int j = 0; j < courses.size(); j++ ){
+                    courseInstances = courses.get(j).getCourseInstances();
+                    for(int k = 0; k < courseInstances.size(); k++){
+                       addEvent(courseInstances.get(k), (dayCount/7), semesters.get(i).getStartDate(), semesters.get(i));
+                    }
+                }
+            }
+
+        }
+
+        private void addEvent(CourseInstance courseInstance, float weeks,MyDate date, Semester semester) throws IOException{
+
+            Event event = new Event()
+                    .setSummary("Google I/O 2015")
+                    .setLocation("800 Howard St., San Francisco, CA 94103")
+                    .setDescription("A chance to hear more about Google's developer products.");
+
+
+            DateTime startDateTime = new DateTime(""+semester.getStartDate().getYear()+"-"+semester.getStartDate().getMonth()+
+                    "-"+semester.getStartDate().getDay()+ "T" + courseInstance.getStartHour()+ ":00:00-07:00");
+            EventDateTime start = new EventDateTime()
+                    .setDateTime(startDateTime);
+            event.setStart(start);
+
+            DateTime endDateTime = new DateTime(""+semester.getEndDate().getYear()+"-"+semester.getEndDate().getMonth()+
+                    "-"+semester.getEndDate().getDay()+ "T" + courseInstance.getEndHour()+ ":00:00-07:00");;
+            EventDateTime end = new EventDateTime()
+                    .setDateTime(endDateTime);
+            event.setEnd(end);
+
+            String calendarId = "primary";
+
+                try {
+                    mService.events().insert(calendarId, event).execute();
+                } catch (Exception e) {
+
+                }
         }
 
     }
