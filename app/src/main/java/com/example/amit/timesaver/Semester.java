@@ -65,6 +65,14 @@ public class Semester implements Serializable{
         return courses;
     }
 
+    public ArrayList<Course> getArrayListCourses() {
+        ArrayList<Course> returnCourses = new ArrayList<>(courses.size());
+        for (Course c: courses.values()) {
+            returnCourses.add(c);
+        }
+        return returnCourses;
+    }
+
     public int getYear() {
         return year;
     }

@@ -67,9 +67,9 @@ public class UtilitiesActivity extends BaseActivity implements EasyPermissions.P
 
     private static final String FRAG_TAG_TIME_PICKER = "Notification Time";
 
-    private ArrayList <Semester> semesters;
-    private HashMap<String, Course> courses;
-    private HashMap<String ,CourseInstance> courseInstances;
+    private ArrayList<Semester> semesters;
+    private ArrayList<Course> courses;
+    private ArrayList<CourseInstance> courseInstances;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,6 +77,7 @@ public class UtilitiesActivity extends BaseActivity implements EasyPermissions.P
         setContentView(R.layout.activity_utilities);
 
         semesters = Dashboard.getInstance().getSemesters();
+
 
         syncWithCalendarButton = findViewById(R.id.utilities_calendar_sync_button);
         setNotificationTime = findViewById(R.id.utilities_notification_time_set);
@@ -267,6 +268,7 @@ public class UtilitiesActivity extends BaseActivity implements EasyPermissions.P
      * Placing the API calls in their own task ensures the UI stays responsive.
      */
     private class MakeRequestTask extends AsyncTask<Void, Void, List<String>> {
+
         private com.google.api.services.calendar.Calendar mService = null;
         private Exception mLastError = null;
 
@@ -277,27 +279,13 @@ public class UtilitiesActivity extends BaseActivity implements EasyPermissions.P
                     transport, jsonFactory, credential)
                     .setApplicationName("Google Calendar API Android Quickstart")
                     .build();
-
-            Button syncButton = findViewById(R.id.utilities_calendar_sync_button);
-            syncButton.setOnClickListener
-                    (new View.OnClickListener() {
-                        @Override
-                        public void onClick (View view) {
-                            try {
-                                syncToCalendar();
-                            } catch (IOException e) {
-
-                            }
-                        }
-                    }
-            );
         }
-
 
 
         @Override
         protected List<String> doInBackground(Void... params) {
             try {
+                syncToCalendar();
                 return getDataFromApi();
             } catch (Exception e) {
                 mLastError = e;
@@ -310,6 +298,7 @@ public class UtilitiesActivity extends BaseActivity implements EasyPermissions.P
             // List the next 10 events from the primary calendar.
             DateTime now = new DateTime(System.currentTimeMillis());
             List<String> eventStrings = new ArrayList<>();
+
             Events events = mService.events().list("primary")
                     .setMaxResults(10)
                     .setTimeMin(now)
@@ -367,28 +356,55 @@ public class UtilitiesActivity extends BaseActivity implements EasyPermissions.P
             }
         }
 
-        private void syncToCalendar() throws IOException{
+        private void syncToCalendar() throws IOException {
             Calendar date1 = Calendar.getInstance();
             Calendar date2 = Calendar.getInstance();
-            for(int i = 0; i < semesters.size(); i++){
-                courses = semesters.get(i).getCourses();
+            for (int i = 0; i < semesters.size(); i++) {
+                courses = semesters.get(i).getArrayListCourses();
                 date1.clear();
                 date1.set(semesters.get(i).getStartDate().getYear(), semesters.get(i).getStartDate().getMonth(), semesters.get(i).getStartDate().getDay());
                 date2.clear();
                 date2.set(semesters.get(i).getEndDate().getYear(), semesters.get(i).getEndDate().getMonth(), semesters.get(i).getEndDate().getDay());
                 long diff = date2.getTimeInMillis() - date1.getTimeInMillis();
                 float dayCount = (float) diff / (24 * 60 * 60 * 1000);
-                for(int j = 0; j < courses.size(); j++ ){
-                    courseInstances = courses.get(j).getCourseInstances();
-                    for(int k = 0; k < courseInstances.size(); k++){
-                       addEvent(courseInstances.get(k), (dayCount/7), semesters.get(i).getStartDate(), semesters.get(i));
+                for (int j = 0; j < courses.size(); j++) {
+                    courseInstances = courses.get(j).getArrayListCourseInstances();
+                    for (int k = 0; k < courseInstances.size(); k++) {
+                        addEvent(courseInstances.get(k), (dayCount / 7),semesters.get(i));
                     }
                 }
             }
 
         }
 
-        private void addEvent(CourseInstance courseInstance, float weeks,MyDate date, Semester semester) throws IOException{
+        private String createStringFormatForDate(CourseInstance courseInstance, MyDate semesterDate) {
+            String toReturn = "";
+            String month;
+            String day;
+            String startHour;
+            String startMinute;
+
+            toReturn += semesterDate.getYear();
+            month = semesterDate.getMonth() < 10 ? "0" + semesterDate.getMonth() : "" + semesterDate.getMonth();
+            toReturn += "-" + month + "-";
+
+            day = semesterDate.getDay() < 10 ? "0" + semesterDate.getDay() : "" + semesterDate.getDay();
+            toReturn += day +"T";
+
+            int hour = courseInstance.getStartHour() / 100;
+            int minute = courseInstance.getStartHour() % 100;
+
+            startHour =  hour < 10 ? "0" + hour : "" + courseInstance.getStartHour();
+            toReturn += startHour + ":";
+
+            startMinute = minute < 10 ? "0" + minute : "" + minute;
+            toReturn += startMinute + ":00-07:00";
+
+            return toReturn;
+
+        }
+
+        private void addEvent(CourseInstance courseInstance, float weeks, Semester semester) throws IOException {
 
             Event event = new Event()
                     .setSummary("Google I/O 2015")
@@ -396,22 +412,23 @@ public class UtilitiesActivity extends BaseActivity implements EasyPermissions.P
                     .setDescription("A chance to hear more about Google's developer products.");
 
 
-            DateTime startDateTime = new DateTime(""+semester.getStartDate().getYear()+"-"+semester.getStartDate().getMonth()+
-                    "-"+semester.getStartDate().getDay()+ "T" + courseInstance.getStartHour()+ ":00:00-07:00");
+            DateTime startDateTime = new DateTime(semester.getStartDate().getYear() + "-" + semester.getStartDate().getMonth() +
+                    "-" + semester.getStartDate().getDay() + "T" + courseInstance.getStartHour() + ":00:00-07:00");
             EventDateTime start = new EventDateTime()
                     .setDateTime(startDateTime);
             event.setStart(start);
 
-            DateTime endDateTime = new DateTime(""+semester.getEndDate().getYear()+"-"+semester.getEndDate().getMonth()+
-                    "-"+semester.getEndDate().getDay()+ "T" + courseInstance.getEndHour()+ ":00:00-07:00");;
+            DateTime endDateTime = new DateTime("" + semester.getEndDate().getYear() + "-" + semester.getEndDate().getMonth() +
+                    "-" + semester.getEndDate().getDay() + "T" + courseInstance.getEndHour() + ":00:00-07:00");
+            ;
             EventDateTime end = new EventDateTime()
                     .setDateTime(endDateTime);
             event.setEnd(end);
 
             String calendarId = "primary";
 
-
-            /*Event event = new Event()
+            /*
+            Event event = new Event()
                     .setSummary("Google I/O 2015")
                     .setLocation("800 Howard St., San Francisco, CA 94103")
                     .setDescription("A chance to hear more about Google's developer products.");
@@ -428,16 +445,16 @@ public class UtilitiesActivity extends BaseActivity implements EasyPermissions.P
                     .setTimeZone("America/Los_Angeles");
             event.setEnd(end);
 
-            String[] recurrence = new String[] {"RRULE:FREQ=DAILY;COUNT=2"};
+            String[] recurrence = new String[]{"RRULE:FREQ=DAILY;COUNT=2"};
             event.setRecurrence(Arrays.asList(recurrence));
 
-            EventAttendee[] attendees = new EventAttendee[] {
+            EventAttendee[] attendees = new EventAttendee[]{
                     new EventAttendee().setEmail("lpage@example.com"),
                     new EventAttendee().setEmail("sbrin@example.com"),
             };
             event.setAttendees(Arrays.asList(attendees));
 
-            EventReminder[] reminderOverrides = new EventReminder[] {
+            EventReminder[] reminderOverrides = new EventReminder[]{
                     new EventReminder().setMethod("email").setMinutes(24 * 60),
                     new EventReminder().setMethod("popup").setMinutes(10),
             };
@@ -448,13 +465,14 @@ public class UtilitiesActivity extends BaseActivity implements EasyPermissions.P
 
             String calendarId = "primary";
             event = service.events().insert(calendarId, event).execute();
-            System.out.printf("Event created: %s\n", event.getHtmlLink());*/
+            System.out.printf("Event created: %s\n", event.getHtmlLink());
+            */
 
             try {
-                    mService.events().insert(calendarId, event).execute();
-                } catch (Exception e) {
+                mService.events().insert(calendarId, event).execute();
+            } catch (Exception e) {
 
-                }
+            }
         }
 
     }

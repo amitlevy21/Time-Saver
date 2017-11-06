@@ -31,6 +31,7 @@ class Course implements Serializable{
         return numOfInstances;
     }
 
+
     public CourseInstance getInstanceAtIndex(int index) {
         return courseInstances.get(index);
     }
@@ -48,6 +49,14 @@ class Course implements Serializable{
 
     public HashMap<String, CourseInstance> getCourseInstances() {
         return courseInstances;
+    }
+
+    public ArrayList<CourseInstance> getArrayListCourseInstances() {
+        ArrayList<CourseInstance> returnInstance = new ArrayList<>(courseInstances.size());
+        for(CourseInstance courseInstance: courseInstances.values()) {
+            returnInstance.add(courseInstance);
+        }
+        return  returnInstance;
     }
 
     @Override
