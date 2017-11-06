@@ -40,6 +40,7 @@ import com.google.api.services.calendar.model.Events;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 
@@ -67,8 +68,8 @@ public class UtilitiesActivity extends BaseActivity implements EasyPermissions.P
     private static final String FRAG_TAG_TIME_PICKER = "Notification Time";
 
     private ArrayList <Semester> semesters;
-    private ArrayList<Course> courses;
-    private ArrayList<CourseInstance> courseInstances;
+    private HashMap<String, Course> courses;
+    private HashMap<String ,CourseInstance> courseInstances;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -110,7 +111,9 @@ public class UtilitiesActivity extends BaseActivity implements EasyPermissions.P
         mCredential = GoogleAccountCredential.usingOAuth2(
                 getApplicationContext(), Arrays.asList(SCOPES))
                 .setBackOff(new ExponentialBackOff());
+
     }
+
 
     @Override
     public void onTimeSet(RadialTimePickerDialogFragment dialog, int hourOfDay, int minute) {
@@ -274,7 +277,23 @@ public class UtilitiesActivity extends BaseActivity implements EasyPermissions.P
                     transport, jsonFactory, credential)
                     .setApplicationName("Google Calendar API Android Quickstart")
                     .build();
+
+            Button syncButton = findViewById(R.id.utilities_calendar_sync_button);
+            syncButton.setOnClickListener
+                    (new View.OnClickListener() {
+                        @Override
+                        public void onClick (View view) {
+                            try {
+                                syncToCalendar();
+                            } catch (IOException e) {
+
+                            }
+                        }
+                    }
+            );
         }
+
+
 
         @Override
         protected List<String> doInBackground(Void... params) {
@@ -348,7 +367,7 @@ public class UtilitiesActivity extends BaseActivity implements EasyPermissions.P
             }
         }
 
-        public void syncToCalendar() throws IOException{
+        private void syncToCalendar() throws IOException{
             Calendar date1 = Calendar.getInstance();
             Calendar date2 = Calendar.getInstance();
             for(int i = 0; i < semesters.size(); i++){
@@ -391,7 +410,47 @@ public class UtilitiesActivity extends BaseActivity implements EasyPermissions.P
 
             String calendarId = "primary";
 
-                try {
+
+            /*Event event = new Event()
+                    .setSummary("Google I/O 2015")
+                    .setLocation("800 Howard St., San Francisco, CA 94103")
+                    .setDescription("A chance to hear more about Google's developer products.");
+
+            DateTime startDateTime = new DateTime("2015-05-28T09:00:00-07:00");
+            EventDateTime start = new EventDateTime()
+                    .setDateTime(startDateTime)
+                    .setTimeZone("America/Los_Angeles");
+            event.setStart(start);
+
+            DateTime endDateTime = new DateTime("2015-05-28T17:00:00-07:00");
+            EventDateTime end = new EventDateTime()
+                    .setDateTime(endDateTime)
+                    .setTimeZone("America/Los_Angeles");
+            event.setEnd(end);
+
+            String[] recurrence = new String[] {"RRULE:FREQ=DAILY;COUNT=2"};
+            event.setRecurrence(Arrays.asList(recurrence));
+
+            EventAttendee[] attendees = new EventAttendee[] {
+                    new EventAttendee().setEmail("lpage@example.com"),
+                    new EventAttendee().setEmail("sbrin@example.com"),
+            };
+            event.setAttendees(Arrays.asList(attendees));
+
+            EventReminder[] reminderOverrides = new EventReminder[] {
+                    new EventReminder().setMethod("email").setMinutes(24 * 60),
+                    new EventReminder().setMethod("popup").setMinutes(10),
+            };
+            Event.Reminders reminders = new Event.Reminders()
+                    .setUseDefault(false)
+                    .setOverrides(Arrays.asList(reminderOverrides));
+            event.setReminders(reminders);
+
+            String calendarId = "primary";
+            event = service.events().insert(calendarId, event).execute();
+            System.out.printf("Event created: %s\n", event.getHtmlLink());*/
+
+            try {
                     mService.events().insert(calendarId, event).execute();
                 } catch (Exception e) {
 
