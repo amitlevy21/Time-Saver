@@ -91,7 +91,9 @@ public class AddCourseInstanceActivity extends BaseActivity implements RadialTim
         databaseReference = mFirebaseDatabase.getReference();
 
         FirebaseUser currentUser = mAuth.getCurrentUser();
-        userID = currentUser.getUid();
+        if (currentUser != null) {
+            userID = currentUser.getUid();
+        }
 
         addListeners();
 
@@ -110,6 +112,13 @@ public class AddCourseInstanceActivity extends BaseActivity implements RadialTim
         super.onResume();
         semesters = Dashboard.getInstance().getSemesters();
         courses = Dashboard.getInstance().getCourses();
+        for (Course c: courses) {
+            HashMap<String, CourseInstance> instances = c.getCourseInstances();
+            for(CourseInstance courseInstance: instances.values()) {
+                if(!courseInstances.contains(courseInstance))
+                    courseInstances.add(courseInstance);
+            }
+        }
         spinCourses = findViewById(R.id.course_spinner);
 
         /*if (getIntent().getSerializableExtra(Keys.COURSES) != null)
@@ -313,15 +322,11 @@ public class AddCourseInstanceActivity extends BaseActivity implements RadialTim
 
 
     private void delete() {
-        int index = findInstanceIndex();
-        if(index != INDEX_OF_INSTANCE_NOT_FOUND) {
-            // TODO: 11/2/2017 remove from firebase
-            courseInstances.remove(index);
-        }
+        //if user wants to delete instances he will need to erase the entire course or just delete the event in
+        // the google calendar
     }
 
 
-    // TODO: 11/2/2017 fix firebase
     private boolean save() {
         final CourseInstance courseInstance;
         final Course course = courses.get(findCourseIndexByName());
@@ -339,31 +344,33 @@ public class AddCourseInstanceActivity extends BaseActivity implements RadialTim
         querySemester.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                String semesterKey = dataSnapshot.getChildren().iterator().next().getKey();
-                Query queryCourse = dataSnapshot.getRef().child(semesterKey).
-                        child("courses").orderByChild("name").equalTo(chosenCourse);
-                queryCourse.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        if(dataSnapshot.exists()) {
-                            DatabaseReference courseData = dataSnapshot.getRef();
-                            String courseKey = dataSnapshot.getChildren().iterator().next().getKey();
-                            Course foundCourse = dataSnapshot.getChildren().iterator().next().getValue(Course.class);
-                            courseData.child(courseKey).child("instances").push().setValue(courseInstance);
-                            int theCourse = findCourseIndexByName();
-                            courses.get(theCourse).addInstance(courseKey, courseInstance);
-                            Toast.makeText(getApplicationContext(), "Instance successfully added!", Toast.LENGTH_LONG).show();
+                if(dataSnapshot.exists()) {
+                    String semesterKey = dataSnapshot.getChildren().iterator().next().getKey();
+                    Query queryCourse = dataSnapshot.getRef().child(semesterKey).
+                            child("courses").orderByChild("name").equalTo(chosenCourse);
+                    queryCourse.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            if (dataSnapshot.exists()) {
+                                DatabaseReference courseData = dataSnapshot.getRef();
+                                String courseKey = dataSnapshot.getChildren().iterator().next().getKey();
+                                Course foundCourse = dataSnapshot.getChildren().iterator().next().getValue(Course.class);
+                                courseData.child(courseKey).child("instances").push().setValue(courseInstance);
+                                int theCourse = findCourseIndexByName();
+                                courses.get(theCourse).addInstance(courseKey, courseInstance);
+                                Toast.makeText(getApplicationContext(), "Instance successfully added!", Toast.LENGTH_LONG).show();
 
-                            course.addInstance(courseKey, courseInstance);
+                                course.addInstance(courseKey, courseInstance);
+
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
 
                         }
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
-                    }
-                });
+                    });
+                }
             }
 
             @Override
@@ -371,8 +378,6 @@ public class AddCourseInstanceActivity extends BaseActivity implements RadialTim
 
             }
         });
-
-
 
         return true;
     }

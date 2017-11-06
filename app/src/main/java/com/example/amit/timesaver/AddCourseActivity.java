@@ -64,7 +64,7 @@ public class AddCourseActivity extends BaseActivity {
         }
 
         semesters = Dashboard.getInstance().getSemesters();
-        courses = new ArrayList<>();
+        courses = Dashboard.getInstance().getCourses();
         semestersSpinner = new ArrayList<>();
 
         setListeners();
@@ -92,13 +92,13 @@ public class AddCourseActivity extends BaseActivity {
         semestersReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                Toast.makeText(getApplicationContext(), "read add course", Toast.LENGTH_SHORT).show();
                 GenericTypeIndicator<HashMap<String, Semester>> t = new GenericTypeIndicator<HashMap<String, Semester>>() {};
 
                 HashMap<String, Semester> semestersFromFireBase = dataSnapshot.getValue(t);
 
                 if (semestersFromFireBase != null) {
                     for (Map.Entry<String, Semester> entry : semestersFromFireBase.entrySet()) {
+                        if(!semestersSpinner.contains(entry.getValue().getName()))
                         semestersSpinner.add(entry.getValue().getName());
                         semesters.add(entry.getValue());
                     }
@@ -130,6 +130,8 @@ public class AddCourseActivity extends BaseActivity {
                 semesterSelected = adapterView.getSelectedItem().toString();
             }
         });
+
+
     }
 
     private void setListeners() {
@@ -218,14 +220,46 @@ public class AddCourseActivity extends BaseActivity {
         });
     }
 
-    private void delete(String courseName) {
+    private void delete(final String courseName) {
         int indexOfCourse = findCourseIndexByName(courseName);
         if (indexOfCourse != INDEX_OF_COURSE_NOT_FOUND) {
-            // TODO: 11/2/2017 remove from firebase
-            Course CourseToDelete = courses.get(indexOfCourse);
             courses.remove(indexOfCourse);
 
-            //Query findCourse = databaseReference.child("users").child(userID).child("semesters").orderByChild("name").equalTo(semesterNameToFind);
+            Query findCourse = databaseReference.child("users").child(userID).child("semesters").orderByChild("name").equalTo(semesterSelected);
+            findCourse.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    if (dataSnapshot.exists()) {
+                        DatabaseReference semesterData = dataSnapshot.getRef();
+                        String semesterKey = dataSnapshot.getChildren().iterator().next().getKey();
+                        Query queryCourse = dataSnapshot.getRef().child(semesterKey).
+                                child("courses").orderByChild("name").equalTo(courseName);
+
+                        queryCourse.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                if (dataSnapshot.exists()) {
+                                    DatabaseReference courseData = dataSnapshot.getRef();
+                                    String courseKey = dataSnapshot.getChildren().iterator().next().getKey();
+                                    Course foundCourse = dataSnapshot.getChildren().iterator().next().getValue(Course.class);
+                                    courseData.child(courseKey).removeValue();
+                                    Toast.makeText(getApplicationContext(), "Course successfully erased!", Toast.LENGTH_LONG).show();
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+
+                            }
+                        });
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
 
         }
     }
