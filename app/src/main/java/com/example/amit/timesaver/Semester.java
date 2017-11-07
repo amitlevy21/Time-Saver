@@ -20,7 +20,6 @@ public class Semester implements Serializable{
     private int year;
     private MyDate startDate;
     private MyDate endDate;
-    private int numOfCourses;
     private HashMap<String,Course> courses;
     private eSemesterType semesterType;
     private String name;
@@ -38,15 +37,12 @@ public class Semester implements Serializable{
         courses = new HashMap<>();
     }
 
-    public void addCourse(String semesterKey, Course course) {
-        courses.put(semesterKey, course);
-        numOfCourses++;
+    public void addCourse(String courseKey, Course course) {
+        courses.put(courseKey, course);
     }
 
-    public void removeCourse(Course course) {
-        courses.remove(course);
-        if(numOfCourses != 0)
-            numOfCourses--;
+    public void removeCourse(String courseKey) {
+        courses.remove(courseKey);
     }
 
     public Course getCourseByName (String courseName) {
@@ -86,11 +82,7 @@ public class Semester implements Serializable{
     }
 
     public int getNumOfCourses() {
-        return numOfCourses;
-    }
-
-    public Course getCourseAtIndex(int index) {
-        return courses.get(index);
+        return courses.size();
     }
 
     public eSemesterType getSemesterType() {
