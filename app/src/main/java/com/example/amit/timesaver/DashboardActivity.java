@@ -1,5 +1,6 @@
 package com.example.amit.timesaver;
 
+import android.icu.util.Calendar;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.widget.TableLayout;
@@ -15,6 +16,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,6 +28,12 @@ public class DashboardActivity extends BaseActivity {
     private DatabaseReference databaseReference;
     private FirebaseAuth mAuth;
     private String userID;
+
+    private MyDate day;
+    private Calendar calendar;
+    private int today = 0, tomorrow = 0, taskDay = 0;
+    int tasksForToday = 0, tasksForTomorrow = 0, numOfTasksDone = 0;
+    private ArrayList<Task> tasks = TaskManager.getInstance().getPendingTasks();
 
 
     @Override
@@ -51,6 +59,7 @@ public class DashboardActivity extends BaseActivity {
         super.onResume();
         loadSemestersFromFireBase();
         updateStats();
+        updateDashboardStats();
     }
 
     private void loadSemestersFromFireBase() {
@@ -96,5 +105,40 @@ public class DashboardActivity extends BaseActivity {
             TextView textView = (TextView) row.getChildAt(1);
             textView.setText(String.valueOf(quantityToday[i]));
         }
+    }
+
+    private void updateDashboardStats(){
+        calendar = Calendar.getInstance();
+        today = (calendar.get(Calendar.YEAR)) * (calendar.get(Calendar.MONTH)+1) * (calendar.get(Calendar.DAY_OF_MONTH));
+        tomorrow = (calendar.get(Calendar.YEAR)) * (calendar.get(Calendar.MONTH)+1) * (calendar.get(Calendar.DAY_OF_MONTH)+1);
+
+        for(int i = 0; i < tasks.size(); i++){
+            if(!(tasks.get(i).isDone()) ){
+                day = tasks.get(i).getDueDate();
+                taskDay = ((day.getDay()) * (day.getMonth() + 1) * (day.getYear()));
+                if (today == taskDay) {
+                    tasksForToday++;
+                }
+                else if (tomorrow == taskDay) {
+                    tasksForTomorrow++;
+                }
+            }else numOfTasksDone++;
+        }
+
+        TextView tasksForTodayText = (TextView)findViewById(R.id.dashboard_num_of_tasks_due_today);
+        tasksForTodayText.setText(String.valueOf(tasksForToday));
+
+        TextView coursesForTodayText = (TextView)findViewById(R.id.dashboard_num_of_classes_today);
+        coursesForTodayText.setText("s");
+
+        TextView tasksDoneText = (TextView)findViewById(R.id.dashboard_total_tasks_done);
+        tasksDoneText.setText(String.valueOf(numOfTasksDone));
+
+        TextView tasksForTomorrowText = (TextView)findViewById(R.id.dashboard_num_of_tasks_due_tomorrow);
+        tasksForTomorrowText.setText(String.valueOf(tasksForTomorrow));
+
+        TextView coursesForTomorrowText = (TextView)findViewById(R.id.dashboard_num_of_classes_tomorrow);
+        coursesForTomorrowText.setText("s");
+
     }
 }
