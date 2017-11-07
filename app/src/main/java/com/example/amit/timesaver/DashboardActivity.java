@@ -33,7 +33,7 @@ public class DashboardActivity extends BaseActivity {
     private Calendar calendar;
     private int today = 0, tomorrow = 0, taskDay = 0;
     int tasksForToday = 0, tasksForTomorrow = 0, numOfTasksDone = 0;
-    private ArrayList<Task> tasks = TaskManager.getInstance().getPendingTasks();
+    private ArrayList<Task> tasks;
 
 
     @Override
@@ -49,6 +49,9 @@ public class DashboardActivity extends BaseActivity {
         mFirebaseDatabase = FirebaseDatabase.getInstance();
         databaseReference = mFirebaseDatabase.getReference();
         mAuth = FirebaseAuth.getInstance();
+
+        tasks = dashboard.getTasks();
+        TaskManager.getInstance().setPendingTasks(tasks);
 
         FirebaseUser currentUser = mAuth.getCurrentUser();
         userID = currentUser.getUid();
@@ -74,6 +77,29 @@ public class DashboardActivity extends BaseActivity {
                 if (semestersFromFireBase != null) {
                     for (Map.Entry<String, Semester> entry : semestersFromFireBase.entrySet()) {
                         dashboard.getSemesters().add(entry.getValue());
+                    }
+
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+        DatabaseReference tasksRef = databaseReference.child("users").child(userID).child("tasks");
+        tasksRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    GenericTypeIndicator<HashMap<String, Task>> t = new GenericTypeIndicator<HashMap<String, Task>>() {};
+
+                    HashMap<String, Task> tasksFromFireBase = dataSnapshot.getValue(t);
+
+                    if (tasksFromFireBase != null) {
+                        for (Map.Entry<String,Task> entry : tasksFromFireBase.entrySet()) {
+                            dashboard.getTasks().add(entry.getValue());
+                        }
                     }
                 }
             }

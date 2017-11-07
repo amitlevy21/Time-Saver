@@ -42,7 +42,7 @@ import com.google.api.services.calendar.model.Events;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
+
 import java.util.List;
 
 
@@ -65,7 +65,7 @@ public class UtilitiesActivity extends BaseActivity implements EasyPermissions.P
 
     private static final String BUTTON_TEXT = "Call Google Calendar API";
     private static final String PREF_ACCOUNT_NAME = "accountName";
-    private static final String[] SCOPES = {CalendarScopes.CALENDAR_READONLY};
+    private static final String[] SCOPES = {CalendarScopes.CALENDAR};
 
     private static final String FRAG_TAG_TIME_PICKER = "Notification Time";
 
@@ -438,19 +438,9 @@ public class UtilitiesActivity extends BaseActivity implements EasyPermissions.P
             String[] recurrence = new String[] {"RRULE:FREQ=DAILY;COUNT=2"};
             event.setRecurrence(Arrays.asList(recurrence));
 
-            EventAttendee[] attendees = new EventAttendee[] {
-                    new EventAttendee().setEmail("lpage@example.com"),
-                    new EventAttendee().setEmail("sbrin@example.com"),
-            };
-            event.setAttendees(Arrays.asList(attendees));
 
-            EventReminder[] reminderOverrides = new EventReminder[] {
-                    new EventReminder().setMethod("email").setMinutes(24 * 60),
-                    new EventReminder().setMethod("popup").setMinutes(10),
-            };
             Event.Reminders reminders = new Event.Reminders()
-                    .setUseDefault(false)
-                    .setOverrides(Arrays.asList(reminderOverrides));
+                    .setUseDefault(true);
             event.setReminders(reminders);
 
 
