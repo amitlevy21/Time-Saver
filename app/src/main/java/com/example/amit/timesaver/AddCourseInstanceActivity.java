@@ -26,17 +26,14 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
-import java.util.Map;
 
 
 public class AddCourseInstanceActivity extends BaseActivity implements RadialTimePickerDialogFragment.OnTimeSetListener,
@@ -324,19 +321,6 @@ public class AddCourseInstanceActivity extends BaseActivity implements RadialTim
     private void delete() {
         //if user wants to delete instances he will need to erase the entire course or just delete the event in
         // the google calendar
-    }
-
-
-    private boolean save() {
-        final CourseInstance courseInstance;
-        final Course course = courses.get(findCourseIndexByName());
-        if (chosenProfessorName != null) {
-            courseInstance = new CourseInstance
-                    (course, chosenDay, chosenStartHour, chosenEndHour, chosenProfessorName);
-        } else {
-            courseInstance = new CourseInstance(course, chosenDay, chosenStartHour, chosenEndHour);
-        }
-        courseInstances.add(courseInstance);
 
         Query querySemester = databaseReference.child("users").child(userID)
                 .child("semesters").orderByChild("name").equalTo(chosenSemester);
@@ -355,12 +339,10 @@ public class AddCourseInstanceActivity extends BaseActivity implements RadialTim
                                 DatabaseReference courseData = dataSnapshot.getRef();
                                 String courseKey = dataSnapshot.getChildren().iterator().next().getKey();
                                 Course foundCourse = dataSnapshot.getChildren().iterator().next().getValue(Course.class);
-                                courseData.child(courseKey).child("instances").push().setValue(courseInstance);
-                                int theCourse = findCourseIndexByName();
-                                courses.get(theCourse).addInstance(courseKey, courseInstance);
-                                Toast.makeText(getApplicationContext(), "Instance successfully added!", Toast.LENGTH_LONG).show();
 
-                                course.addInstance(courseKey, courseInstance);
+                                foundCourse.removeAllInstances();
+                                courseData.child("numOfInstances").setValue(foundCourse.getNumOfInstances());
+                                Toast.makeText(getApplicationContext(), "All instances have been deleted", Toast.LENGTH_LONG).show();
 
                             }
                         }
@@ -378,6 +360,66 @@ public class AddCourseInstanceActivity extends BaseActivity implements RadialTim
 
             }
         });
+
+    }
+
+
+    private boolean save() {
+        final CourseInstance courseInstance;
+        final Course course = courses.get(findCourseIndexByName());
+        if (chosenProfessorName != null) {
+            courseInstance = new CourseInstance
+                    (course, chosenDay, chosenStartHour, chosenEndHour, chosenProfessorName);
+        } else {
+            courseInstance = new CourseInstance(course, chosenDay, chosenStartHour, chosenEndHour);
+        }
+
+
+        if(!courseInstances.contains(courseInstance)) {
+            courseInstances.add(courseInstance);
+
+            Query querySemester = databaseReference.child("users").child(userID)
+                    .child("semesters").orderByChild("name").equalTo(chosenSemester);
+
+            querySemester.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    if (dataSnapshot.exists()) {
+                        String semesterKey = dataSnapshot.getChildren().iterator().next().getKey();
+                        Query queryCourse = dataSnapshot.getRef().child(semesterKey).
+                                child("courses").orderByChild("name").equalTo(chosenCourse);
+                        queryCourse.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                if (dataSnapshot.exists()) {
+                                    DatabaseReference courseData = dataSnapshot.getRef();
+                                    String courseKey = dataSnapshot.getChildren().iterator().next().getKey();
+                                    Course foundCourse = dataSnapshot.getChildren().iterator().next().getValue(Course.class);
+                                    courseData.child(courseKey).child("instances").push().setValue(courseInstance);
+                                    DatabaseReference keyInstanceData = courseData.child(courseKey).child("instances").push();
+                                    String instanceKey = keyInstanceData.getKey();
+                                    int theCourse = findCourseIndexByName();
+                                    courses.get(theCourse).addInstance(instanceKey, courseInstance);
+                                    courseData.child(courseKey).child("numOfInstances").setValue(courses.get(theCourse).getNumOfInstances());
+                                    Toast.makeText(getApplicationContext(), "Instance successfully added!", Toast.LENGTH_LONG).show();
+
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+
+                            }
+                        });
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+        }
 
         return true;
     }

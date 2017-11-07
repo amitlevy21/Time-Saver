@@ -92,14 +92,15 @@ public class AddCourseActivity extends BaseActivity {
         semestersReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                GenericTypeIndicator<HashMap<String, Semester>> t = new GenericTypeIndicator<HashMap<String, Semester>>() {};
+                GenericTypeIndicator<HashMap<String, Semester>> t = new GenericTypeIndicator<HashMap<String, Semester>>() {
+                };
 
                 HashMap<String, Semester> semestersFromFireBase = dataSnapshot.getValue(t);
 
                 if (semestersFromFireBase != null) {
                     for (Map.Entry<String, Semester> entry : semestersFromFireBase.entrySet()) {
-                        if(!semestersSpinner.contains(entry.getValue().getName()))
-                        semestersSpinner.add(entry.getValue().getName());
+                        if (!semestersSpinner.contains(entry.getValue().getName()))
+                            semestersSpinner.add(entry.getValue().getName());
                         semesters.add(entry.getValue());
                     }
                 }
@@ -194,22 +195,28 @@ public class AddCourseActivity extends BaseActivity {
         course = new Course(courseName);
 
 
-        courses.add(course);
         Query query = databaseReference.child("users").child(userID)
                 .child("semesters").orderByChild("name").equalTo(semesterSelected);
-        final String key = query.getRef().getKey();
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                if(dataSnapshot.exists()) {
-                    DatabaseReference semesterData = dataSnapshot.getRef();
-                    String semesterKey = dataSnapshot.getChildren().iterator().next().getKey();
-                    Semester foundSemester = dataSnapshot.getChildren().iterator().next().getValue(Semester.class);
-                    semesterData.child(semesterKey).child("courses").push().setValue(course);
-                    int theSemester = findSemesterIndexByName();
-                    semesters.get(theSemester).addCourse(semesterKey, course);
-                    Toast.makeText(getApplicationContext(), "Course successfully added!", Toast.LENGTH_LONG).show();
+                if (!courses.contains(course)) {
+                    if (dataSnapshot.exists()) {
+                        DatabaseReference semesterData = dataSnapshot.getRef();
+                        String semesterKey = dataSnapshot.getChildren().iterator().next().getKey();
+                        Semester foundSemester = dataSnapshot.getChildren().iterator().next().getValue(Semester.class);
 
+                        semesterData.child(semesterKey).child("courses").push().setValue(course);
+                        int theSemester = findSemesterIndexByName();
+
+                        DatabaseReference dataKey = semesterData.child(semesterKey).child("courses").push();
+                        String courseKey = dataKey.getKey();
+                        semesters.get(theSemester).addCourse(courseKey, course);
+                        semesterData.child(semesterKey).child("numOfCourses").setValue(semesters.get(theSemester).getNumOfCourses());
+                        courses.add(course);
+                        Toast.makeText(getApplicationContext(), "Course successfully added!", Toast.LENGTH_LONG).show();
+
+                    }
                 }
             }
 
@@ -225,13 +232,14 @@ public class AddCourseActivity extends BaseActivity {
         if (indexOfCourse != INDEX_OF_COURSE_NOT_FOUND) {
             courses.remove(indexOfCourse);
 
+
             Query findCourse = databaseReference.child("users").child(userID).child("semesters").orderByChild("name").equalTo(semesterSelected);
             findCourse.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     if (dataSnapshot.exists()) {
-                        DatabaseReference semesterData = dataSnapshot.getRef();
-                        String semesterKey = dataSnapshot.getChildren().iterator().next().getKey();
+                        final DatabaseReference semesterData = dataSnapshot.getRef();
+                        final String semesterKey = dataSnapshot.getChildren().iterator().next().getKey();
                         Query queryCourse = dataSnapshot.getRef().child(semesterKey).
                                 child("courses").orderByChild("name").equalTo(courseName);
 
@@ -243,6 +251,9 @@ public class AddCourseActivity extends BaseActivity {
                                     String courseKey = dataSnapshot.getChildren().iterator().next().getKey();
                                     Course foundCourse = dataSnapshot.getChildren().iterator().next().getValue(Course.class);
                                     courseData.child(courseKey).removeValue();
+                                    int theSemester = findSemesterIndexByName();
+                                    semesters.get(theSemester).removeCourse(courseKey);
+                                    semesterData.child(semesterKey).child("numOfCourses").setValue(semesters.get(theSemester).getNumOfCourses());
                                     Toast.makeText(getApplicationContext(), "Course successfully erased!", Toast.LENGTH_LONG).show();
                                 }
                             }

@@ -36,7 +36,7 @@ class CourseInstance implements Serializable{
         this(course,dayOfWeek,startHour,endHour, null);
     }
 
-    public Course getCourse() {
+    public Course getCourseName() {
         return course;
     }
 
@@ -60,7 +60,7 @@ class CourseInstance implements Serializable{
     public boolean equals(Object obj) {
         if(obj instanceof CourseInstance) {
             CourseInstance temp = (CourseInstance) obj;
-            return course.equals(temp.getCourse()) && startHour == temp.getStartHour();
+            return course.equals(temp.getCourseName()) && startHour == temp.getStartHour();
         }
         return false;
     }

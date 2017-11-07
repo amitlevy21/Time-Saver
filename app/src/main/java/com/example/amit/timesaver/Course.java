@@ -14,7 +14,6 @@ class Course implements Serializable{
 
     private String name;
     private HashMap<String, CourseInstance> courseInstances = new HashMap<>();
-    private int numOfInstances;
 
     public Course() {
     }
@@ -28,23 +27,17 @@ class Course implements Serializable{
     }
 
     public int getNumOfInstances() {
-        return numOfInstances;
+        return courseInstances.size();
     }
 
-
-    public CourseInstance getInstanceAtIndex(int index) {
-        return courseInstances.get(index);
-    }
 
     public void addInstance(String courseKey, CourseInstance courseInstance) {
         courseInstances.put(courseKey, courseInstance);
-        numOfInstances++;
     }
 
-    public void removeInstance(CourseInstance courseInstance) {
-        courseInstances.remove(courseInstance);
-        if(numOfInstances != 0)
-            numOfInstances--;
+    public void removeAllInstances() {
+        courseInstances.clear();
+
     }
 
     public HashMap<String, CourseInstance> getCourseInstances() {
