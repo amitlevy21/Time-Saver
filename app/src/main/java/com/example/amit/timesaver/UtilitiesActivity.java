@@ -33,7 +33,9 @@ import com.google.api.client.util.DateTime;
 import com.google.api.client.util.ExponentialBackOff;
 import com.google.api.services.calendar.CalendarScopes;
 import com.google.api.services.calendar.model.Event;
+import com.google.api.services.calendar.model.EventAttendee;
 import com.google.api.services.calendar.model.EventDateTime;
+import com.google.api.services.calendar.model.EventReminder;
 import com.google.api.services.calendar.model.Events;
 
 
@@ -357,6 +359,7 @@ public class UtilitiesActivity extends BaseActivity implements EasyPermissions.P
         }
 
         private void syncToCalendar() throws IOException {
+            String startCourse, endCourse, start = "start", end = "end";
             Calendar date1 = Calendar.getInstance();
             Calendar date2 = Calendar.getInstance();
             for (int i = 0; i < semesters.size(); i++) {
@@ -370,19 +373,24 @@ public class UtilitiesActivity extends BaseActivity implements EasyPermissions.P
                 for (int j = 0; j < courses.size(); j++) {
                     courseInstances = courses.get(j).getArrayListCourseInstances();
                     for (int k = 0; k < courseInstances.size(); k++) {
-                        addEvent(courseInstances.get(k), (dayCount / 7),semesters.get(i));
+                        startCourse = createStringFormatForDate(courseInstances.get(k)
+                                ,semesters.get(i).getStartDate(), start);
+                        endCourse = createStringFormatForDate(courseInstances.get(k)
+                                ,semesters.get(i).getStartDate(), end);
+                        addEvent(startCourse,endCourse);
                     }
                 }
             }
 
         }
 
-        private String createStringFormatForDate(CourseInstance courseInstance, MyDate semesterDate) {
+        private String createStringFormatForDate(CourseInstance courseInstance, MyDate semesterDate, String startOrEnd) {
             String toReturn = "";
             String month;
             String day;
             String startHour;
             String startMinute;
+            int hour, minute;
 
             toReturn += semesterDate.getYear();
             month = semesterDate.getMonth() < 10 ? "0" + semesterDate.getMonth() : "" + semesterDate.getMonth();
@@ -391,10 +399,14 @@ public class UtilitiesActivity extends BaseActivity implements EasyPermissions.P
             day = semesterDate.getDay() < 10 ? "0" + semesterDate.getDay() : "" + semesterDate.getDay();
             toReturn += day +"T";
 
-            int hour = courseInstance.getStartHour() / 100;
-            int minute = courseInstance.getStartHour() % 100;
-
-            startHour =  hour < 10 ? "0" + hour : "" + courseInstance.getStartHour();
+            if(startOrEnd.compareTo("start") == 0) {
+                hour = (courseInstance.getStartHour() / 100);
+                minute = (courseInstance.getStartHour() % 100);
+            }else{
+                hour = (courseInstance.getEndHour() / 100);
+                minute = (courseInstance.getEndHour() % 100);
+            }
+            startHour =  hour < 10 ? "0" + hour : "" + hour;
             toReturn += startHour + ":";
 
             startMinute = minute < 10 ? "0" + minute : "" + minute;
@@ -404,57 +416,35 @@ public class UtilitiesActivity extends BaseActivity implements EasyPermissions.P
 
         }
 
-        private void addEvent(CourseInstance courseInstance, float weeks, Semester semester) throws IOException {
+        private void addEvent(String startDate, String endDate) throws IOException {
 
             Event event = new Event()
                     .setSummary("Google I/O 2015")
                     .setLocation("800 Howard St., San Francisco, CA 94103")
                     .setDescription("A chance to hear more about Google's developer products.");
 
-
-            DateTime startDateTime = new DateTime(semester.getStartDate().getYear() + "-" + semester.getStartDate().getMonth() +
-                    "-" + semester.getStartDate().getDay() + "T" + courseInstance.getStartHour() + ":00:00-07:00");
-            EventDateTime start = new EventDateTime()
-                    .setDateTime(startDateTime);
-            event.setStart(start);
-
-            DateTime endDateTime = new DateTime("" + semester.getEndDate().getYear() + "-" + semester.getEndDate().getMonth() +
-                    "-" + semester.getEndDate().getDay() + "T" + courseInstance.getEndHour() + ":00:00-07:00");
-            ;
-            EventDateTime end = new EventDateTime()
-                    .setDateTime(endDateTime);
-            event.setEnd(end);
-
-            String calendarId = "primary";
-
-            /*
-            Event event = new Event()
-                    .setSummary("Google I/O 2015")
-                    .setLocation("800 Howard St., San Francisco, CA 94103")
-                    .setDescription("A chance to hear more about Google's developer products.");
-
-            DateTime startDateTime = new DateTime("2015-05-28T09:00:00-07:00");
+            DateTime startDateTime = new DateTime(startDate);
             EventDateTime start = new EventDateTime()
                     .setDateTime(startDateTime)
-                    .setTimeZone("America/Los_Angeles");
+                    .setTimeZone("Asia/Jerusalem");
             event.setStart(start);
 
-            DateTime endDateTime = new DateTime("2015-05-28T17:00:00-07:00");
+            DateTime endDateTime = new DateTime(endDate);
             EventDateTime end = new EventDateTime()
                     .setDateTime(endDateTime)
-                    .setTimeZone("America/Los_Angeles");
+                    .setTimeZone("Asia/Jerusalem");
             event.setEnd(end);
 
-            String[] recurrence = new String[]{"RRULE:FREQ=DAILY;COUNT=2"};
+            String[] recurrence = new String[] {"RRULE:FREQ=DAILY;COUNT=2"};
             event.setRecurrence(Arrays.asList(recurrence));
 
-            EventAttendee[] attendees = new EventAttendee[]{
+            EventAttendee[] attendees = new EventAttendee[] {
                     new EventAttendee().setEmail("lpage@example.com"),
                     new EventAttendee().setEmail("sbrin@example.com"),
             };
             event.setAttendees(Arrays.asList(attendees));
 
-            EventReminder[] reminderOverrides = new EventReminder[]{
+            EventReminder[] reminderOverrides = new EventReminder[] {
                     new EventReminder().setMethod("email").setMinutes(24 * 60),
                     new EventReminder().setMethod("popup").setMinutes(10),
             };
@@ -463,10 +453,8 @@ public class UtilitiesActivity extends BaseActivity implements EasyPermissions.P
                     .setOverrides(Arrays.asList(reminderOverrides));
             event.setReminders(reminders);
 
+
             String calendarId = "primary";
-            event = service.events().insert(calendarId, event).execute();
-            System.out.printf("Event created: %s\n", event.getHtmlLink());
-            */
 
             try {
                 mService.events().insert(calendarId, event).execute();
