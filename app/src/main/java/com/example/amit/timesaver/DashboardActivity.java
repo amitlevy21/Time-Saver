@@ -18,7 +18,9 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 
 public class DashboardActivity extends BaseActivity {
@@ -32,9 +34,10 @@ public class DashboardActivity extends BaseActivity {
     private MyDate day;
     private Calendar calendar;
     private int today = 0, tomorrow = 0, taskDay = 0;
-    int tasksForToday = 0, tasksForTomorrow = 0, numOfTasksDone = 0;
+    private int tasksForToday = 0, tasksForTomorrow = 0, numOfTasksDone = 0, numOfTotalCourses = 0;
     private ArrayList<Task> tasks;
 
+    private ArrayList<Course> courses = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,19 +53,21 @@ public class DashboardActivity extends BaseActivity {
         databaseReference = mFirebaseDatabase.getReference();
         mAuth = FirebaseAuth.getInstance();
 
-        tasks = dashboard.getTasks();
+        tasks = TaskManager.getInstance().getPendingTasks();
         TaskManager.getInstance().setPendingTasks(tasks);
 
         FirebaseUser currentUser = mAuth.getCurrentUser();
         userID = currentUser.getUid();
+
+        courses = dashboard.getCourses();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         loadSemestersFromFireBase();
-        updateStats();
         updateDashboardStats();
+
     }
 
     private void loadSemestersFromFireBase() {
@@ -113,32 +118,12 @@ public class DashboardActivity extends BaseActivity {
         });
     }
 
-    private void updateStats() {
-        int[] quantityToday = {dashboard.getNumOfTodaysTasksDue(), dashboard.getNumOfTodaysClasses(), dashboard.getNumOfTotalTasksDone()};
-        int[] quantityTomorrow = {dashboard.getNumOfTomorrowsTasksDue(), dashboard.getNumOfTomorrowsClasses()};
-
-        TableLayout tableLayoutToday = findViewById(R.id.dashboard_table_today);
-
-        for (int i = 0; i < quantityToday.length; i++) {
-            TableRow row = (TableRow) tableLayoutToday.getChildAt(i);
-            TextView textView = (TextView) row.getChildAt(1);
-            textView.setText(String.valueOf(quantityToday[i]));
-
-        }
-
-        TableLayout tableLayoutTomorrow = findViewById(R.id.dashboard_table_tomorrow);
-
-        for (int i = 0; i < quantityTomorrow.length; i++) {
-            TableRow row = (TableRow) tableLayoutTomorrow.getChildAt(i);
-            TextView textView = (TextView) row.getChildAt(1);
-            textView.setText(String.valueOf(quantityToday[i]));
-        }
-    }
-
     private void updateDashboardStats(){
         calendar = Calendar.getInstance();
         today = (calendar.get(Calendar.YEAR)) * (calendar.get(Calendar.MONTH)+1) * (calendar.get(Calendar.DAY_OF_MONTH));
         tomorrow = (calendar.get(Calendar.YEAR)) * (calendar.get(Calendar.MONTH)+1) * (calendar.get(Calendar.DAY_OF_MONTH)+1);
+
+        numOfTotalCourses = courses.size();
 
         for(int i = 0; i < tasks.size(); i++){
             if(!(tasks.get(i).isDone()) ){
@@ -156,17 +141,14 @@ public class DashboardActivity extends BaseActivity {
         TextView tasksForTodayText = (TextView)findViewById(R.id.dashboard_num_of_tasks_due_today);
         tasksForTodayText.setText(String.valueOf(tasksForToday));
 
-        TextView coursesForTodayText = (TextView)findViewById(R.id.dashboard_num_of_classes_today);
-        coursesForTodayText.setText("s");
-
         TextView tasksDoneText = (TextView)findViewById(R.id.dashboard_total_tasks_done);
         tasksDoneText.setText(String.valueOf(numOfTasksDone));
 
         TextView tasksForTomorrowText = (TextView)findViewById(R.id.dashboard_num_of_tasks_due_tomorrow);
         tasksForTomorrowText.setText(String.valueOf(tasksForTomorrow));
 
-        TextView coursesForTomorrowText = (TextView)findViewById(R.id.dashboard_num_of_classes_tomorrow);
-        coursesForTomorrowText.setText("s");
+        TextView tatalCoursesText = (TextView)findViewById(R.id.dashboard_num_of_classes);
+        tatalCoursesText.setText(String.valueOf(numOfTotalCourses));
 
     }
 }
