@@ -30,6 +30,10 @@ public class TaskManager {
         return pendingTasks.size();
     }
 
+    public void setPendingTasks(ArrayList<Task> pendingTasks) {
+        this.pendingTasks = pendingTasks;
+    }
+
     public void markTaskAsDone(Task task) {
         int index = pendingTasks.indexOf(task);
         pendingTasks.get(index).markAsDone();
