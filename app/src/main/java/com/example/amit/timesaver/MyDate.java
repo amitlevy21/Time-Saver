@@ -34,7 +34,7 @@ class MyDate implements Comparable<MyDate> , Serializable{
     }
 
     public int getMonth() {
-        return month;
+        return month + 1;
     }
 
     public void setMonth(int month) {

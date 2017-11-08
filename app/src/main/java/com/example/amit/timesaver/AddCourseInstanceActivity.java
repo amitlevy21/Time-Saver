@@ -68,6 +68,7 @@ public class AddCourseInstanceActivity extends BaseActivity implements RadialTim
     private ArrayAdapter<String> adapterSemesterSpinner;
     private Spinner spinCourses;
     private ArrayList<Semester> semesters;
+    private MyDate date;
 
 
     @Override
@@ -223,6 +224,8 @@ public class AddCourseInstanceActivity extends BaseActivity implements RadialTim
         TextView dayTaken = findViewById(R.id.day_taken_button);
         dayTaken.setText(chosenDay.name());
 
+        date = new MyDate(year, monthOfYear, dayOfMonth);
+
     }
 
 
@@ -369,9 +372,9 @@ public class AddCourseInstanceActivity extends BaseActivity implements RadialTim
         final Course course = courses.get(findCourseIndexByName());
         if (chosenProfessorName != null) {
             courseInstance = new CourseInstance
-                    (course, chosenDay, chosenStartHour, chosenEndHour, chosenProfessorName);
+                    (course, date, chosenDay, chosenStartHour, chosenEndHour, chosenProfessorName);
         } else {
-            courseInstance = new CourseInstance(course, chosenDay, chosenStartHour, chosenEndHour);
+            courseInstance = new CourseInstance(course, date, chosenDay, chosenStartHour, chosenEndHour);
         }
 
 
@@ -445,7 +448,7 @@ public class AddCourseInstanceActivity extends BaseActivity implements RadialTim
 
     private int findInstanceIndex() {
         Course c = courses.get(findCourseIndexByName());
-        CourseInstance instanceToFind = new CourseInstance(c, chosenDay, chosenStartHour, chosenEndHour, chosenProfessorName);
+        CourseInstance instanceToFind = new CourseInstance(c, date, chosenDay, chosenStartHour, chosenEndHour, chosenProfessorName);
         for (int i = 0; i < courseInstances.size(); i++) {
             if (courseInstances.get(i).equals(instanceToFind)) {
                 return i;

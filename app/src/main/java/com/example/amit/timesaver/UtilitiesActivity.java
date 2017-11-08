@@ -359,7 +359,6 @@ public class UtilitiesActivity extends BaseActivity implements EasyPermissions.P
         }
 
         private void syncToCalendar() throws IOException {
-            String startCourse, endCourse, start = "start", end = "end";
             Calendar date1 = Calendar.getInstance();
             Calendar date2 = Calendar.getInstance();
             for (int i = 0; i < semesters.size(); i++) {
@@ -369,43 +368,38 @@ public class UtilitiesActivity extends BaseActivity implements EasyPermissions.P
                 date2.clear();
                 date2.set(semesters.get(i).getEndDate().getYear(), semesters.get(i).getEndDate().getMonth(), semesters.get(i).getEndDate().getDay());
                 long diff = date2.getTimeInMillis() - date1.getTimeInMillis();
-                float dayCount = (float) diff / (24 * 60 * 60 * 1000);
+                int dayCountForSemester = (int) diff / (24 * 60 * 60 * 1000);
                 for (int j = 0; j < courses.size(); j++) {
                     courseInstances = courses.get(j).getArrayListCourseInstances();
                     for (int k = 0; k < courseInstances.size(); k++) {
-                        startCourse = createStringFormatForDate(courseInstances.get(k)
-                                ,semesters.get(i).getStartDate(), start);
-                        endCourse = createStringFormatForDate(courseInstances.get(k)
-                                ,semesters.get(i).getStartDate(), end);
-                        addEvent(startCourse,endCourse);
+                        String startSemester = createStringFormatForDate(semesters.get(i).getStartDate(),0);
+                        String startCourse = createStringFormatForDate(courseInstances.get(k).getDay(),
+                                courseInstances.get(k).getStartHour());
+                        String endCourse = createStringFormatForDate(courseInstances.get(k).getDay(),
+                                courseInstances.get(k).getEndHour());
+                        addEvent(courseInstances.get(k), dayCountForSemester, startCourse, endCourse);
                     }
                 }
             }
 
         }
 
-        private String createStringFormatForDate(CourseInstance courseInstance, MyDate semesterDate, String startOrEnd) {
+        private String createStringFormatForDate(MyDate date, int hourNMinute) {
             String toReturn = "";
             String month;
             String day;
             String startHour;
             String startMinute;
-            int hour, minute;
+            int hour = hourNMinute / 100;
+            int minute = hourNMinute % 100;
 
-            toReturn += semesterDate.getYear();
-            month = semesterDate.getMonth() < 10 ? "0" + semesterDate.getMonth() : "" + semesterDate.getMonth();
+            toReturn += date.getYear();
+            month = date.getMonth() < 10 ? "0" + date.getMonth() : "" + date.getMonth();
             toReturn += "-" + month + "-";
 
-            day = semesterDate.getDay() < 10 ? "0" + semesterDate.getDay() : "" + semesterDate.getDay();
+            day = date.getDay() < 10 ? "0" + date.getDay() : "" + date.getDay();
             toReturn += day +"T";
 
-            if(startOrEnd.compareTo("start") == 0) {
-                hour = (courseInstance.getStartHour() / 100);
-                minute = (courseInstance.getStartHour() % 100);
-            }else{
-                hour = (courseInstance.getEndHour() / 100);
-                minute = (courseInstance.getEndHour() % 100);
-            }
             startHour =  hour < 10 ? "0" + hour : "" + hour;
             toReturn += startHour + ":";
 
@@ -416,12 +410,11 @@ public class UtilitiesActivity extends BaseActivity implements EasyPermissions.P
 
         }
 
-        private void addEvent(String startDate, String endDate) throws IOException {
+        private void addEvent(CourseInstance courseInstance,int dayCountForSemester, String startDate, String endDate) throws IOException {
 
             Event event = new Event()
-                    .setSummary("Google I/O 2015")
-                    .setLocation("800 Howard St., San Francisco, CA 94103")
-                    .setDescription("A chance to hear more about Google's developer products.");
+                    .setSummary(courseInstance.getCourseName().getName())
+                    .setDescription(" with " + courseInstance.getProfessorName());
 
             DateTime startDateTime = new DateTime(startDate);
             EventDateTime start = new EventDateTime()
@@ -435,29 +428,19 @@ public class UtilitiesActivity extends BaseActivity implements EasyPermissions.P
                     .setTimeZone("Asia/Jerusalem");
             event.setEnd(end);
 
-            String[] recurrence = new String[] {"RRULE:FREQ=DAILY;COUNT=2"};
+            String[] recurrence = new String[] {"RRULE:FREQ=WEEKLY;COUNT=" + dayCountForSemester};
             event.setRecurrence(Arrays.asList(recurrence));
 
-            EventAttendee[] attendees = new EventAttendee[] {
-                    new EventAttendee().setEmail("lpage@example.com"),
-                    new EventAttendee().setEmail("sbrin@example.com"),
-            };
-            event.setAttendees(Arrays.asList(attendees));
 
-            EventReminder[] reminderOverrides = new EventReminder[] {
-                    new EventReminder().setMethod("email").setMinutes(24 * 60),
-                    new EventReminder().setMethod("popup").setMinutes(10),
-            };
             Event.Reminders reminders = new Event.Reminders()
-                    .setUseDefault(false)
-                    .setOverrides(Arrays.asList(reminderOverrides));
+                    .setUseDefault(true);
             event.setReminders(reminders);
 
 
             String calendarId = "primary";
 
             try {
-                mService.events().insert(calendarId, event).execute();
+                mService.events().delete(calendarId, event.getId()).execute();
             } catch (Exception e) {
 
             }

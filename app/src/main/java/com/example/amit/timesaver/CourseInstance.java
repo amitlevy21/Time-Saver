@@ -16,6 +16,7 @@ class CourseInstance implements Serializable{
     private int startHour;
     private int endHour;
     private String professorName;
+    private MyDate day;
 
     enum eDay {
         SUNDAY, MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY
@@ -24,20 +25,25 @@ class CourseInstance implements Serializable{
     public CourseInstance() {
     }
 
-    public CourseInstance(Course course, eDay dayOfWeek, int startHour, int endHour, String professorName) {
+    public CourseInstance(Course course,MyDate day, eDay dayOfWeek, int startHour, int endHour, String professorName) {
         this.course = course;
         this.dayOfWeek = dayOfWeek;
         this.startHour = startHour;
         this.endHour = endHour;
         this.professorName = professorName;
+        this.day = day;
     }
 
-    public CourseInstance(Course course, eDay dayOfWeek, int startHour, int endHour) {
-        this(course,dayOfWeek,startHour,endHour, null);
+    public CourseInstance(Course course,MyDate day, eDay dayOfWeek, int startHour, int endHour) {
+        this(course,day, dayOfWeek,startHour,endHour, null);
     }
 
     public Course getCourseName() {
         return course;
+    }
+
+    public MyDate getDay() {
+        return day;
     }
 
     public eDay getDayOfWeek() {
