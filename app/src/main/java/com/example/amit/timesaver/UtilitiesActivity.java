@@ -363,9 +363,9 @@ public class UtilitiesActivity extends BaseActivity implements EasyPermissions.P
             for (int i = 0; i < semesters.size(); i++) {
                 courses = semesters.get(i).getArrayListCourses();
                 date1.clear();
-                date1.set(semesters.get(i).getStartDate().getYear(), semesters.get(i).getStartDate().getMonth(), semesters.get(i).getStartDate().getDay());
+                date1.set(semesters.get(i).getStartDate().getYear(), semesters.get(i).getStartDate().getMonth() + 1, semesters.get(i).getStartDate().getDay());
                 date2.clear();
-                date2.set(semesters.get(i).getEndDate().getYear(), semesters.get(i).getEndDate().getMonth(), semesters.get(i).getEndDate().getDay());
+                date2.set(semesters.get(i).getEndDate().getYear(), semesters.get(i).getEndDate().getMonth() + 1, semesters.get(i).getEndDate().getDay());
                 long diff = date2.getTimeInMillis() - date1.getTimeInMillis();
                 int dayCountForSemester = (int) diff / (24 * 60 * 60 * 1000);
                 for (int j = 0; j < courses.size(); j++) {
@@ -393,7 +393,7 @@ public class UtilitiesActivity extends BaseActivity implements EasyPermissions.P
             int minute = hourNMinute % 100;
 
             toReturn += date.getYear();
-            month = date.getMonth() < 10 ? "0" + date.getMonth() : "" + date.getMonth();
+            month = date.getMonth() + 1 < 10 ? "0" + (date.getMonth() + 1) : "" + (date.getMonth() + 1);
             toReturn += "-" + month + "-";
 
             day = date.getDay() < 10 ? "0" + date.getDay() : "" + date.getDay();
