@@ -66,36 +66,6 @@
                     android:text="@string/tasks_due"/>
             </TableRow>
 
-            <TableRow
-                android:id="@+id/table_row_class"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/small_margin">
-
-                <ImageView
-                    android:id="@+id/image_classes"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/classes_today"
-                    android:contentDescription="@string/dashboard_classes" />
-
-                <TextView
-                    android:id="@+id/dashboard_num_of_classes_today"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginStart="@dimen/large_margin"
-                    android:textStyle="bold"/>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginStart="@dimen/extra_large_margin"
-                    android:textStyle="bold"
-                    android:textSize="@dimen/small_text_size"
-                    android:text="@string/dashboard_classes"/>
-            </TableRow>
 
             <TableRow
                 android:id="@+id/table_total_tasks_done"
@@ -185,10 +155,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:src="@drawable/classes_today"
-                    android:contentDescription="@string/dashboard_classes" />
+                    android:contentDescription="@string/dashboard_courses" />
 
                 <TextView
-                    android:id="@+id/dashboard_num_of_classes_tomorrow"
+                    android:id="@+id/dashboard_num_of_classes"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
@@ -202,7 +172,7 @@
                     android:layout_marginStart="@dimen/extra_large_margin"
                     android:textStyle="bold"
                     android:textSize="@dimen/small_text_size"
-                    android:text="@string/dashboard_classes"/>
+                    android:text="@string/dashboard_courses"/>
             </TableRow>
 
         </TableLayout>

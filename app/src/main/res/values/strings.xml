@@ -18,7 +18,7 @@
     <string name="dashboard">The Dashboard</string>
     <string name="dashboard_today">Today\'s Activity</string>
     <string name="tasks_due"># Tasks Due</string>
-    <string name="dashboard_classes"># Classes</string>
+    <string name="dashboard_courses"># Number of courses</string>
     <string name="total_tasks_done"># Total tasks done</string>
     <string name="tomorrows_activity">Tomorrow\'s Activity</string>
     <string name="logo">logo</string>
