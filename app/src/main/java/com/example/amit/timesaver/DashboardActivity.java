@@ -76,7 +76,9 @@ public class DashboardActivity extends BaseActivity {
 
                 if (semestersFromFireBase != null) {
                     for (Map.Entry<String, Semester> entry : semestersFromFireBase.entrySet()) {
-                        dashboard.getSemesters().add(entry.getValue());
+                        if(!dashboard.getSemesters().contains(entry.getValue()))
+                            dashboard.getSemesters().add(entry.getValue());
+
                     }
 
                 }

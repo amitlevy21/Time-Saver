@@ -322,8 +322,6 @@ public class AddCourseInstanceActivity extends BaseActivity implements RadialTim
 
 
     private void delete() {
-        //if user wants to delete instances he will need to erase the entire course or just delete the event in
-        // the google calendar
 
         Query querySemester = databaseReference.child("users").child(userID)
                 .child("semesters").orderByChild("name").equalTo(chosenSemester);
@@ -372,9 +370,9 @@ public class AddCourseInstanceActivity extends BaseActivity implements RadialTim
         final Course course = courses.get(findCourseIndexByName());
         if (chosenProfessorName != null) {
             courseInstance = new CourseInstance
-                    (course, date, chosenDay, chosenStartHour, chosenEndHour, chosenProfessorName);
+                    (course,date, chosenDay, chosenStartHour, chosenEndHour, chosenProfessorName);
         } else {
-            courseInstance = new CourseInstance(course, date, chosenDay, chosenStartHour, chosenEndHour);
+            courseInstance = new CourseInstance(course,date, chosenDay, chosenStartHour, chosenEndHour);
         }
 
 
@@ -448,7 +446,7 @@ public class AddCourseInstanceActivity extends BaseActivity implements RadialTim
 
     private int findInstanceIndex() {
         Course c = courses.get(findCourseIndexByName());
-        CourseInstance instanceToFind = new CourseInstance(c, date, chosenDay, chosenStartHour, chosenEndHour, chosenProfessorName);
+        CourseInstance instanceToFind = new CourseInstance(c, date,chosenDay, chosenStartHour, chosenEndHour, chosenProfessorName);
         for (int i = 0; i < courseInstances.size(); i++) {
             if (courseInstances.get(i).equals(instanceToFind)) {
                 return i;

@@ -11,8 +11,8 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.provider.CalendarContract;
 import android.support.annotation.NonNull;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Switch;
@@ -33,9 +33,7 @@ import com.google.api.client.util.DateTime;
 import com.google.api.client.util.ExponentialBackOff;
 import com.google.api.services.calendar.CalendarScopes;
 import com.google.api.services.calendar.model.Event;
-import com.google.api.services.calendar.model.EventAttendee;
 import com.google.api.services.calendar.model.EventDateTime;
-import com.google.api.services.calendar.model.EventReminder;
 import com.google.api.services.calendar.model.Events;
 
 
@@ -53,6 +51,7 @@ import pub.devrel.easypermissions.EasyPermissions;
 public class UtilitiesActivity extends BaseActivity implements EasyPermissions.PermissionCallbacks, RadialTimePickerDialogFragment.OnTimeSetListener {
 
 
+    private static final String TAG = "time.saver.app";
     GoogleAccountCredential mCredential;
     private Button syncWithCalendarButton;
     private TextView setNotificationTime;
@@ -413,7 +412,7 @@ public class UtilitiesActivity extends BaseActivity implements EasyPermissions.P
         private void addEvent(CourseInstance courseInstance,int dayCountForSemester, String startDate, String endDate) throws IOException {
 
             Event event = new Event()
-                    .setSummary(courseInstance.getCourseName().getName())
+                    .setSummary(courseInstance.getCourse().getName())
                     .setDescription(" with " + courseInstance.getProfessorName());
 
             DateTime startDateTime = new DateTime(startDate);
@@ -428,7 +427,8 @@ public class UtilitiesActivity extends BaseActivity implements EasyPermissions.P
                     .setTimeZone("Asia/Jerusalem");
             event.setEnd(end);
 
-            String[] recurrence = new String[] {"RRULE:FREQ=WEEKLY;COUNT=" + dayCountForSemester};
+            String count = String.valueOf(dayCountForSemester/7);
+            String[] recurrence = new String[] {"RRULE:FREQ=WEEKLY;COUNT=" + count};
             event.setRecurrence(Arrays.asList(recurrence));
 
 
@@ -440,9 +440,9 @@ public class UtilitiesActivity extends BaseActivity implements EasyPermissions.P
             String calendarId = "primary";
 
             try {
-                mService.events().delete(calendarId, event.getId()).execute();
+                mService.events().insert(calendarId, event).execute();
             } catch (Exception e) {
-
+                Log.d(TAG, "addEvent: ",e.fillInStackTrace());
             }
         }
 
