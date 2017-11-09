@@ -117,7 +117,7 @@ public class DashboardActivity extends BaseActivity {
                                                             }
                                                         }
                                                     }
-                                                    Toast.makeText(getApplicationContext(), "FireBase Data has loaded!", Toast.LENGTH_LONG).show();
+                                                    Toast.makeText(getApplicationContext(), "FireBase Data has loaded!", Toast.LENGTH_SHORT).show();
                                                 }
 
                                                 @Override

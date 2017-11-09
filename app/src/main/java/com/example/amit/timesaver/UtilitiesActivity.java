@@ -63,7 +63,6 @@ public class UtilitiesActivity extends BaseActivity implements EasyPermissions.P
     static final int REQUEST_GOOGLE_PLAY_SERVICES = 1002;
     static final int REQUEST_PERMISSION_GET_ACCOUNTS = 1003;
 
-    private static final String BUTTON_TEXT = "Call Google Calendar API";
     private static final String PREF_ACCOUNT_NAME = "accountName";
     private static final String[] SCOPES = {CalendarScopes.CALENDAR};
 
@@ -145,6 +144,7 @@ public class UtilitiesActivity extends BaseActivity implements EasyPermissions.P
         } else if (!isDeviceOnline()) {
             Toast.makeText(getApplicationContext(), "No network connection available.", Toast.LENGTH_LONG).show();
         } else {
+
             new MakeRequestTask(mCredential).execute();
         }
     }
@@ -328,7 +328,8 @@ public class UtilitiesActivity extends BaseActivity implements EasyPermissions.P
 
         @Override
         protected void onPreExecute() {
-
+            syncWithCalendarButton.setEnabled(false);
+            syncWithCalendarButton.setClickable(false);
         }
 
         @Override
@@ -340,6 +341,8 @@ public class UtilitiesActivity extends BaseActivity implements EasyPermissions.P
                 output.add(0, "Data retrieved using the Google Calendar API:");
                 //mOutputText.setText(TextUtils.join("\n", output));
             }
+            syncWithCalendarButton.setClickable(true);
+            syncWithCalendarButton.setEnabled(true);
         }
 
         @Override
