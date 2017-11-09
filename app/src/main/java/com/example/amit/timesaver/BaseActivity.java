@@ -7,13 +7,7 @@ import android.icu.util.Calendar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.BaseAdapter;
-import android.widget.CompoundButton;
-import android.widget.Switch;
-import android.widget.TextView;
-import android.widget.Toast;
 
-import com.codetroopers.betterpickers.radialtimepicker.RadialTimePickerDialogFragment;
 import com.google.firebase.auth.FirebaseAuth;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
@@ -46,24 +40,15 @@ public class BaseActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_base);
 
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY, notificationHour);
+        calendar.set(Calendar.MINUTE, notificationMinute);
+        calendar.set(Calendar.SECOND, 0);
+        Intent intent1 = new Intent(BaseActivity.this, AlarmReceiver.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(BaseActivity.this, 0,intent1, PendingIntent.FLAG_UPDATE_CURRENT);
+        AlarmManager am = (AlarmManager) BaseActivity.this.getSystemService(BaseActivity.this.ALARM_SERVICE);
+        am.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent);
 
-        Switch mySwitch = findViewById(R.id.utilities_notification_switch);
-        mySwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-
-                notificationHour = getNotificationHour();
-                notificationMinute = getNotificationMinute();
-
-                Calendar calendar = Calendar.getInstance();
-                calendar.set(Calendar.HOUR_OF_DAY, notificationHour);
-                calendar.set(Calendar.MINUTE, notificationMinute);
-                calendar.set(Calendar.SECOND, 0);
-                Intent intent1 = new Intent(BaseActivity.this, AlarmReceiver.class);
-                PendingIntent pendingIntent = PendingIntent.getBroadcast(BaseActivity.this, 0,intent1, PendingIntent.FLAG_UPDATE_CURRENT);
-                AlarmManager am = (AlarmManager) BaseActivity.this.getSystemService(BaseActivity.this.ALARM_SERVICE);
-                am.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent);
-            }
-        });
 
         drawerBuilder = new DrawerBuilder().withActivity(this)
                 .withDisplayBelowStatusBar(false)

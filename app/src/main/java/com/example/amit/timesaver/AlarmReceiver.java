@@ -11,7 +11,6 @@ import android.icu.util.GregorianCalendar;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
-import android.widget.Switch;
 
 import java.util.ArrayList;
 import java.util.Date;
