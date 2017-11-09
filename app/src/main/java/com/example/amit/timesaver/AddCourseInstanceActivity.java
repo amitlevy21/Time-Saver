@@ -179,30 +179,27 @@ public class AddCourseInstanceActivity extends BaseActivity implements RadialTim
             case FRAG_TAG_TIME_PICKER_START: {
                 chosenStartHour = hourOfDay * 100 + minute;
                 TextView startHourButton = findViewById(R.id.start_hour_button);
-                String hourToDisplay;
-                if (chosenStartHour < 1000) {
-                    if (minute < 10)
-                        hourToDisplay = "0" + hourOfDay + ":0" + minute;
-                    else
-                        hourToDisplay = "0" + hourOfDay + ":" + minute;
-                } else
-                    hourToDisplay = String.valueOf(chosenStartHour);
-                startHourButton.setText(String.valueOf(hourToDisplay));
+
+                String hourToDisplay = "";
+                String hourStr = hourOfDay < 10 ? "0" + hourOfDay : "" + hourOfDay;
+                hourToDisplay += hourStr + ":";
+
+                String minuteStr = minute < 10 ? "0" + minute : "" + minute;
+                hourToDisplay += minuteStr;
+                startHourButton.setText(hourToDisplay);
                 break;
             }
             case FRAG_TAG_TIME_PICKER_END: {
                 if (hourOfDay * 100 + minute > chosenStartHour) {
                     chosenEndHour = hourOfDay * 100 + minute;
                     TextView endHourButton = findViewById(R.id.end_hour_button);
-                    String hourToDisplay;
-                    if (chosenEndHour < 1000) {
-                        if (minute < 10)
-                            hourToDisplay = "0" + hourOfDay + ":0" + minute;
-                        else
-                            hourToDisplay = "0" + hourOfDay + ":" + minute;
-                    } else
-                        hourToDisplay = hourOfDay + ":" + minute;
-                    endHourButton.setText(String.valueOf(hourToDisplay));
+                    String hourToDisplay = "";
+                    String hourStr = hourOfDay < 10 ? "0" + hourOfDay : "" + hourOfDay;
+                    hourToDisplay += hourStr + ":";
+
+                    String minuteStr = minute < 10 ? "0" + minute : "" + minute;
+                    hourToDisplay += minuteStr;
+                    endHourButton.setText(hourToDisplay);
                 } else {
                     Toast.makeText(getApplicationContext(), "Please choose valid hours", Toast.LENGTH_LONG).show();
                 }
@@ -313,8 +310,7 @@ public class AddCourseInstanceActivity extends BaseActivity implements RadialTim
         fab.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
-                if (checkInput())
-                    delete();
+                delete();
                 return true;
             }
         });
@@ -341,8 +337,12 @@ public class AddCourseInstanceActivity extends BaseActivity implements RadialTim
                                 String courseKey = dataSnapshot.getChildren().iterator().next().getKey();
                                 Course foundCourse = dataSnapshot.getChildren().iterator().next().getValue(Course.class);
 
-                                foundCourse.removeAllInstances();
-                                courseData.child("numOfInstances").setValue(foundCourse.getNumOfInstances());
+                                if (foundCourse != null) {
+                                    foundCourse.removeAllInstances();
+                                    courseData.child(courseKey).child("numOfInstances").setValue(foundCourse.getNumOfInstances());
+                                    courseData.child(courseKey).child("instances").removeValue();
+                                }
+
                                 Toast.makeText(getApplicationContext(), "All instances have been deleted", Toast.LENGTH_LONG).show();
 
                             }

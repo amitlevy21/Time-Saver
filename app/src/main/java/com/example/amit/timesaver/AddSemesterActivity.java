@@ -151,6 +151,8 @@ public class AddSemesterActivity extends BaseActivity implements CalendarDatePic
                     Semester semester = new Semester(yearSelected, startDateSelected, endDateSelected, semesterTypeSelected);
                     semestersToAdd.add(semester);
                     databaseReference.child("users").child(userID).child("semesters").push().setValue(semester);
+                    Toast.makeText(getApplicationContext(), "Semester successfully added!", Toast.LENGTH_LONG).show();
+
 
 
                     Intent intentEnterCourses = new Intent(getApplicationContext(), AddCourseActivity.class);

@@ -6,6 +6,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -78,14 +79,63 @@ public class DashboardActivity extends BaseActivity {
                 GenericTypeIndicator<HashMap<String, Semester>> t = new GenericTypeIndicator<HashMap<String, Semester>>() {};
 
                 HashMap<String, Semester> semestersFromFireBase = dataSnapshot.getValue(t);
-
+                ArrayList<String> semesterKeys = null;
                 if (semestersFromFireBase != null) {
+                    semesterKeys = new ArrayList<>(semestersFromFireBase.size());
                     for (Map.Entry<String, Semester> entry : semestersFromFireBase.entrySet()) {
-                        if(!dashboard.getSemesters().contains(entry.getValue()))
+                        if(!dashboard.getSemesters().contains(entry.getValue())) {
                             dashboard.getSemesters().add(entry.getValue());
+                            semesterKeys.add(entry.getKey());
+                        }
 
                     }
+                }
 
+
+
+                // Hash map of instances loads with size 0, load instances separately
+                if (semesterKeys != null) {
+                    for(String key : semesterKeys) {
+                        DatabaseReference instancesData = dataSnapshot.getRef().child(key).child("courses");
+                        instancesData.addValueEventListener(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(DataSnapshot dataSnapshot) {
+
+                                        for (DataSnapshot courseSnapshot : dataSnapshot.getChildren()) {
+                                            courseSnapshot.getRef().child("instances").addValueEventListener(new ValueEventListener() {
+                                                @Override
+                                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                                    GenericTypeIndicator<HashMap<String, CourseInstance>> t
+                                                            = new GenericTypeIndicator<HashMap<String, CourseInstance>>() {};
+
+                                                    HashMap<String, CourseInstance> instanceFireBase = dataSnapshot.getValue(t);
+
+                                                    if (instanceFireBase != null) {
+                                                        for (Map.Entry<String, CourseInstance> entry : instanceFireBase.entrySet()) {
+                                                            for (Course course: dashboard.getCourses()) {
+                                                                course.addInstance(entry.getKey(), entry.getValue());
+                                                            }
+                                                        }
+                                                    }
+                                                    Toast.makeText(getApplicationContext(), "FireBase Data has loaded!", Toast.LENGTH_LONG).show();
+                                                }
+
+                                                @Override
+                                                public void onCancelled(DatabaseError databaseError) {
+
+                                                }
+                                            });
+
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onCancelled(DatabaseError databaseError) {
+
+                                    }
+                                });
+
+                    }
                 }
             }
 

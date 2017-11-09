@@ -12,6 +12,7 @@ import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -76,6 +77,10 @@ public class UtilitiesActivity extends BaseActivity implements EasyPermissions.P
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_utilities);
+
+        buildDrawer();
+        DrawerLayout.LayoutParams dlp = (DrawerLayout.LayoutParams) findViewById(R.id.utilities_main).getLayoutParams();
+        dlp.setMargins(50, 50, 50, 50);
 
         semesters = Dashboard.getInstance().getSemesters();
 
@@ -441,6 +446,7 @@ public class UtilitiesActivity extends BaseActivity implements EasyPermissions.P
 
             try {
                 mService.events().insert(calendarId, event).execute();
+                Toast.makeText(getApplicationContext(), "Calendar Events created successfully!", Toast.LENGTH_LONG).show();
             } catch (Exception e) {
                 Log.d(TAG, "addEvent: ",e.fillInStackTrace());
             }

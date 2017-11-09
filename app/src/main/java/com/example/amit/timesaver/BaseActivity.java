@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
@@ -23,6 +24,7 @@ public class BaseActivity extends AppCompatActivity {
     protected static final int ADD_COURSE_DRAWER_POSITION = 3;
     protected static final int ADD_INSTANCE_DRAWER_POSITION = 4;
     private static final int UTILITIES_DRAWER_POSITION = 5;
+    private static final int SIGN_OUT_DRAWER_POSITION = 6;
 
 
     private DrawerBuilder drawerBuilder;
@@ -32,7 +34,6 @@ public class BaseActivity extends AppCompatActivity {
     private int notificationMinute = 0;
 
 
-    // TODO: 04/11/17 add notifications time to firebase and load
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         setTheme(R.style.AppTheme);
@@ -60,7 +61,8 @@ public class BaseActivity extends AppCompatActivity {
                         new SecondaryDrawerItem().withName("Add Semester").withIcon(R.drawable.semester_menu_ic).withSelectable(false),
                         new SecondaryDrawerItem().withName("Add Course").withIcon(R.drawable.course_menu_ic).withSelectable(false),
                         new SecondaryDrawerItem().withName("Add Course Instance").withIcon(R.drawable.instance_menu_ic).withSelectable(false),
-                        new SecondaryDrawerItem().withName("Utilities").withIcon(R.drawable.utilities_icon)
+                        new SecondaryDrawerItem().withName("Utilities").withIcon(R.drawable.utilities_icon).withSelectable(false),
+                        new SecondaryDrawerItem().withName("Sign Out").withIcon(R.drawable.sign_out_icon).withSelectable(false)
 
                 )
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
@@ -92,6 +94,12 @@ public class BaseActivity extends AppCompatActivity {
                                 }
                                 case UTILITIES_DRAWER_POSITION: {
                                     intent = new Intent(BaseActivity.this, UtilitiesActivity.class);
+                                    break;
+                                }
+                                case SIGN_OUT_DRAWER_POSITION: {
+                                    FirebaseAuth mAuth = FirebaseAuth.getInstance();
+                                    mAuth.signOut();
+                                    intent = new Intent(BaseActivity.this, LoginActivity.class);
                                     break;
                                 }
                             }

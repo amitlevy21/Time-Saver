@@ -2,6 +2,7 @@ package com.example.amit.timesaver;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Map;
 
 /**
  * Created by amit on 13/10/17.
@@ -82,6 +83,7 @@ public class Dashboard implements Serializable{
         }
         return toReturn;
     }
+
 
     public void setSemesters(ArrayList<Semester> semesters) {
         this.semesters = semesters;
