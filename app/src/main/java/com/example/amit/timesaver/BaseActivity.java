@@ -138,12 +138,10 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     public void setNotificationHour(int notificationHour) {
-        // TODO: 04/11/17 add to firebase
         this.notificationHour = notificationHour;
     }
 
     public void setNotificationMinute(int notificationMinute) {
-        // TODO: 04/11/17 add to firebase
         this.notificationMinute = notificationMinute;
     }
 }

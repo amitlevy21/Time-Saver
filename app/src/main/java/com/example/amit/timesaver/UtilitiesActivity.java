@@ -368,6 +368,7 @@ public class UtilitiesActivity extends BaseActivity implements EasyPermissions.P
         private void syncToCalendar() throws IOException {
             Calendar date1 = Calendar.getInstance();
             Calendar date2 = Calendar.getInstance();
+            ArrayList<Course> added = new ArrayList<>();
             for (int i = 0; i < semesters.size(); i++) {
                 courses = semesters.get(i).getArrayListCourses();
                 date1.clear();
@@ -375,7 +376,7 @@ public class UtilitiesActivity extends BaseActivity implements EasyPermissions.P
                 date2.clear();
                 date2.set(semesters.get(i).getEndDate().getYear(), semesters.get(i).getEndDate().getMonth() + 1, semesters.get(i).getEndDate().getDay());
                 long diff = date2.getTimeInMillis() - date1.getTimeInMillis();
-                int dayCountForSemester = (int) diff / (24 * 60 * 60 * 1000);
+                long dayCountForSemester = (long) diff / (24 * 60 * 60 * 1000);
                 for (int j = 0; j < courses.size(); j++) {
                     courseInstances = courses.get(j).getArrayListCourseInstances();
                     for (int k = 0; k < courseInstances.size(); k++) {
@@ -384,7 +385,10 @@ public class UtilitiesActivity extends BaseActivity implements EasyPermissions.P
                                 courseInstances.get(k).getStartHour());
                         String endCourse = createStringFormatForDate(courseInstances.get(k).getDay(),
                                 courseInstances.get(k).getEndHour());
-                        addEvent(courseInstances.get(k), dayCountForSemester, startCourse, endCourse);
+                        if(!added.contains(courseInstances.get(k).getCourse())) {
+                            addEvent(courseInstances.get(k), dayCountForSemester, startCourse, endCourse);
+                            added.add(courseInstances.get(k).getCourse());
+                        }
                     }
                 }
             }
@@ -404,20 +408,20 @@ public class UtilitiesActivity extends BaseActivity implements EasyPermissions.P
             month = date.getMonth() + 1 < 10 ? "0" + (date.getMonth() + 1) : "" + (date.getMonth() + 1);
             toReturn += "-" + month + "-";
 
-            day = date.getDay() < 10 ? "0" + date.getDay() : "" + date.getDay();
+            day = date.getDay() + 1 < 10 ? "0" + (date.getDay() - 1) : "" + (date.getDay() - 1);
             toReturn += day +"T";
 
             startHour =  hour < 10 ? "0" + hour : "" + hour;
             toReturn += startHour + ":";
 
             startMinute = minute < 10 ? "0" + minute : "" + minute;
-            toReturn += startMinute + ":00-07:00";
+            toReturn += startMinute + ":00-22:00";
 
             return toReturn;
 
         }
 
-        private void addEvent(CourseInstance courseInstance,int dayCountForSemester, String startDate, String endDate) throws IOException {
+        private void addEvent(CourseInstance courseInstance,long dayCountForSemester, String startDate, String endDate) throws IOException {
 
             Event event = new Event()
                     .setSummary(courseInstance.getCourse().getName())
